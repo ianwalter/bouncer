@@ -1,2 +1,0 @@
-defmodule Bouncer do
-end

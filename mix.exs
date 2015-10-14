@@ -1,13 +1,25 @@
 defmodule Bouncer.Mixfile do
   use Mix.Project
 
+  defp package do
+    [
+      files: ["lib", "mix.exs", "README", "LICENSE*"],
+      maintainers: ["Ian Walter"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/ianwalter/bouncer"}
+    ]
+  end
+
   def project do
-    [app: :bouncer,
-     version: "0.0.1",
-     elixir: "~> 1.1",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps]
+    [
+      app: :bouncer,
+      version: "0.0.1",
+      elixir: "~> 1.1",
+      build_embedded: Mix.env == :prod,
+      start_permanent: Mix.env == :prod,
+      deps: deps,
+      package: package
+    ]
   end
 
   # Configuration for the OTP application
@@ -27,6 +39,11 @@ defmodule Bouncer.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [
+      {:phoenix, ">= 1.0.0"},
+      {:httpoison, "~> 0.7.2"},
+      {:redix, ">= 0.0.0", only: :test},
+      {:mock, "~> 0.1.0", only: :test}
+    ]
   end
 end

@@ -1,6 +1,6 @@
 # Bouncer
 
-**TODO: Add description**
+**Token-based authentication and session management for Phoenix (Elixir)**
 
 ## Installation
 
