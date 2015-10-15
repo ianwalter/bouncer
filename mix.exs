@@ -3,11 +3,17 @@ defmodule Bouncer.Mixfile do
 
   defp package do
     [
-      files: ["lib", "mix.exs", "README", "LICENSE*"],
+      files: ["lib", "mix.exs", "README.md", "LICENSE"],
       maintainers: ["Ian Walter"],
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/ianwalter/bouncer"}
     ]
+  end
+
+  defp description do
+    """
+    Token-based authorization and session management for Phoenix (Elixir)
+    """
   end
 
   def project do
@@ -19,6 +25,7 @@ defmodule Bouncer.Mixfile do
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
       deps: deps,
+      description: description,
       package: package
     ]
   end
