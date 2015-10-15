@@ -31,7 +31,7 @@ defmodule Bouncer.Adapters.Redis do
 
   ## Examples
       iex> Bouncer.Adapters.Redis.get("UdOnTkNoW")
-      { :ok, ~s("id": 1) }
+      { :ok, ~s({"id": 1}) }
       iex> Bouncer.Adapters.Redis.get("test")
       { :error, nil }
       iex> Bouncer.Adapters.Redis.get(nil)

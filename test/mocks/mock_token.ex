@@ -2,7 +2,7 @@ defmodule Bouncer.MockToken do
   def verify(_, _, token) do
     case token do
       "test" -> { :error, :invalid }
-      "UdOnTkNoW" -> { :ok, %{id: 1} }
+      "UdOnTkNoW" -> { :ok, 1 }
     end
   end
 

@@ -47,7 +47,6 @@ defmodule Bouncer.Mixfile do
     [
       { :phoenix, ">= 1.0.0" },
       { :httpoison, "~> 0.7.2" },
-      { :redix, ">= 0.0.0", only: :test },
       { :mock, "~> 0.1.0", only: :test }
     ]
   end
