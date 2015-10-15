@@ -36,7 +36,7 @@ defmodule Bouncer.Session do
         |> adapter.get
         |> parse_data
         |> verify_user_match(id)
-      _ -> { :error, "Could not verify token" }
+      _ -> {:error, "Could not verify token"}
     end
   end
 
@@ -44,21 +44,21 @@ defmodule Bouncer.Session do
   Parses JSON session data retrieved from the store into a map.
 
   ## Examples
-      iex> Bouncer.Session.parse_data({ :ok, ~s({"id": 1}) })
-      { :ok, %{id: 1} }
-      iex> Bouncer.Session.parse_data({ :error, nil })
-      { :error, nil }
-      iex> Bouncer.Session.parse_data({ :ok, "" })
-      { :error, :invalid }
+      iex> Bouncer.Session.parse_data {:ok, ~s({"id": 1})}
+      {:ok, %{id: 1}}
+      iex> Bouncer.Session.parse_data {:error, nil}
+      {:error, nil}
+      iex> Bouncer.Session.parse_data {:ok, ""}
+      {:error, :invalid}
   """
-  def parse_data({ status, response }) do
+  def parse_data({status, response}) do
     case status do
       :ok ->
         case Poison.Parser.parse response, keys: :atoms! do
-          { :ok, data} -> { :ok, data }
-          { status, response } -> { :error, response }
+          {:ok, data} -> {:ok, data}
+          {status, response} -> {:error, response}
         end
-      status -> { status, response }
+      status -> {status, response}
     end
   end
 
@@ -67,22 +67,22 @@ defmodule Bouncer.Session do
   session data.
 
   ## Examples
-      iex> Bouncer.Session.verify_user_match({ :ok, %{id: 1} }, 1)
-      { :ok, %{id: 1} }
-      iex> Bouncer.Session.verify_user_match({ :ok, %{id: 2} }, 1)
-      { :error, "Token ID does not match session data ID" }
-      iex> Bouncer.Session.verify_user_match({ :error, nil }, 1)
-      { :error, nil }
+      iex> Bouncer.Session.verify_user_match {:ok, %{id: 1}}, 1
+      {:ok, %{id: 1}}
+      iex> Bouncer.Session.verify_user_match {:ok, %{id: 2}}, 1
+      {:error, "Token ID does not match session data ID"}
+      iex> Bouncer.Session.verify_user_match {:error, nil}, 1
+      {:error, nil}
   """
-  def verify_user_match({ status, response }, id) do
+  def verify_user_match({status, response}, id) do
     case status do
       :ok ->
         if Map.has_key?(response, :id) && response.id === id do
-          { :ok, response }
+          {:ok, response}
         else
-          { :error, "Token ID does not match session data ID"}
+          {:error, "Token ID does not match session data ID"}
         end
-      status -> { status, response }
+      status -> {status, response}
     end
   end
 
@@ -90,4 +90,18 @@ defmodule Bouncer.Session do
   Destroys a session by removing session data from the store.
   """
   def destroy(key), do: adapter.delete(key)
+
+  @doc """
+  Convenience function to determine if the ID from the current_user in the
+  request matches the given User ID.
+
+  ## examples
+      iex> Bouncer.Session.user_request? %{assigns: %{current_user: %{id: 1}}}, 1
+      true
+  """
+  def user_request?(conn, id) do
+    conn.assigns.current_user &&
+    Map.has_key?(conn.assigns.current_user, :id) &&
+    conn.assigns.current_user.id === id
+  end
 end

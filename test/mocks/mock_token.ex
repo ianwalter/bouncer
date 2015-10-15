@@ -1,8 +1,8 @@
 defmodule Bouncer.MockToken do
   def verify(_, _, token) do
     case token do
-      "test" -> { :error, :invalid }
-      "UdOnTkNoW" -> { :ok, 1 }
+      "test" -> {:error, :invalid}
+      "UdOnTkNoW" -> {:ok, 1}
     end
   end
 

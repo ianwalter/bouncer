@@ -19,7 +19,7 @@ defmodule Bouncer.Mixfile do
   def project do
     [
       app: :bouncer,
-      version: "0.0.1",
+      version: "0.0.2",
       elixir: ">= 1.0.0",
       elixirc_paths: elixirc_paths(Mix.env),
       build_embedded: Mix.env == :prod,
@@ -52,9 +52,9 @@ defmodule Bouncer.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      { :phoenix, ">= 1.0.0" },
-      { :httpoison, "~> 0.7.2" },
-      { :mock, "~> 0.1.0", only: :test }
+      {:phoenix, ">= 1.0.0"},
+      {:httpoison, "~> 0.7.2"},
+      {:mock, "~> 0.1.0", only: :test}
     ]
   end
 end

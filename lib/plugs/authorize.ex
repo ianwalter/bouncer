@@ -22,10 +22,10 @@ defmodule Bouncer.Plugs.Authorize do
     token = conn |> get_authorization_header |> get_authorization_token
 
     case conn |> Session.get(token) |> add_user_to_connection(conn) do
-      { :ok, conn } -> conn
-      { :error, _ } ->
-        # TODO Log error
-        conn
+      {:ok, conn} -> conn
+
+      # TODO Figure out what to do with errors
+      {:error, _} -> conn
     end
   end
 
@@ -40,9 +40,9 @@ defmodule Bouncer.Plugs.Authorize do
   Pulls the authorization token out of the request header value.
 
   ## Examples
-      iex> Bouncer.Plugs.Authorize.get_authorization_token("Bearer: test")
+      iex> Bouncer.Plugs.Authorize.get_authorization_token "Bearer: test"
       "test"
-      iex> Bouncer.Plugs.Authorize.get_authorization_token(nil)
+      iex> Bouncer.Plugs.Authorize.get_authorization_token nil
       nil
   """
   def get_authorization_token(header_value) do
@@ -56,10 +56,10 @@ defmodule Bouncer.Plugs.Authorize do
   Adds the user's session data to the connection so that the controller actions
   that use the plug can determine what to do with the information.
   """
-  def add_user_to_connection({ status, response }, conn) do
+  def add_user_to_connection({status, response}, conn) do
     case status do
-      :ok -> { :ok, Conn.assign(conn, :current_user, response) }
-      _ -> { status, response }
+      :ok -> {:ok, Conn.assign(conn, :current_user, response)}
+      _ -> {status, response}
     end
   end
 end
