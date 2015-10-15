@@ -25,7 +25,7 @@ allows you to immediately invalidate sessions.
 
 ## Installation
 
-Bouncer is [available in Hex](https://hex.pm/docs/publish), the package can be
+Bouncer is [available in Hex](https://hex.pm/packages/bouncer), the package can be
 installed as:
 
   1. Add bouncer to your list of dependencies in `mix.exs`:
@@ -68,7 +68,7 @@ plug Bouncer.Plugs.Authorize when action in [:show, :update, :delete]
 ## Session API
 
 This is a summary of the Session API. Full package documentation is available at
-http://hexdocs.pm/bouncer
+https://hexdocs.pm/bouncer
 
 #### Session.create(conn, user)
 
