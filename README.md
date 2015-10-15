@@ -95,7 +95,8 @@ defmodule MyApp.SessionController do
   alias MyApp.User
   alias Bouncer.Session
 
-  plug Elector.Plugs.Authenticated when action in [:delete]
+  plug :scrub_params, "user" when action in [:create]
+  plug Bouncer.Plugs.Authorize when action in [:delete]
 
   def create(conn, %{"user" => user_params}) do
     # TODO
