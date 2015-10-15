@@ -12,8 +12,8 @@ defmodule Bouncer.Adapters.Redis do
   Saves session data to Redis using a given key.
 
   ## Examples
-      iex> Bouncer.Adapters.Redis.save(~s({"id": 1}), 1)
-      { :ok, "OK" }
+      iex> Bouncer.Adapters.Redis.save(~s({"id": 1}), "UdOnTkNoW")
+      { :ok, "UdOnTkNoW" }
       iex> Bouncer.Adapters.Redis.save(~s({"id": 2}), nil)
       { :error, "wrong number of arguments" }
       iex> Bouncer.Adapters.Redis.save(nil, 3)
@@ -21,7 +21,7 @@ defmodule Bouncer.Adapters.Redis do
   """
   def save(data, key) do
     case redis().command(~w(SET) ++ [key] ++ [data]) do
-      { :ok, response } -> { :ok, response }
+      { :ok, _ } -> { :ok, key }
       { _, response } -> { :error, response }
     end
   end
@@ -30,9 +30,9 @@ defmodule Bouncer.Adapters.Redis do
   Retrieves session data from Redis using a given key.
 
   ## Examples
-      iex> Bouncer.Adapters.Redis.get(1)
+      iex> Bouncer.Adapters.Redis.get("UdOnTkNoW")
       { :ok, ~s("id": 1) }
-      iex> Bouncer.Adapters.Redis.get(2)
+      iex> Bouncer.Adapters.Redis.get("test")
       { :error, nil }
       iex> Bouncer.Adapters.Redis.get(nil)
       { :error, "wrong number of arguments" }

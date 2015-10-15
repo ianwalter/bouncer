@@ -1,4 +1,5 @@
 use Mix.Config
 
 config :bouncer,
-  adapter: Bouncer.Adapters.Redis
+  adapter: Bouncer.Adapters.Redis,
+  redis: Bouncer.MockRedis

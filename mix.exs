@@ -14,13 +14,18 @@ defmodule Bouncer.Mixfile do
     [
       app: :bouncer,
       version: "0.0.1",
-      elixir: "~> 1.1",
+      elixir: ">= 1.0.0",
+      elixirc_paths: elixirc_paths(Mix.env),
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
       deps: deps,
       package: package
     ]
   end
+
+  # Specifies which paths to compile per environment.
+  defp elixirc_paths(:test), do: ["lib", "test/mocks"]
+  defp elixirc_paths(_),     do: ["lib"]
 
   # Configuration for the OTP application
   #
@@ -40,10 +45,10 @@ defmodule Bouncer.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:phoenix, ">= 1.0.0"},
-      {:httpoison, "~> 0.7.2"},
-      {:redix, ">= 0.0.0", only: :test},
-      {:mock, "~> 0.1.0", only: :test}
+      { :phoenix, ">= 1.0.0" },
+      { :httpoison, "~> 0.7.2" },
+      { :redix, ">= 0.0.0", only: :test },
+      { :mock, "~> 0.1.0", only: :test }
     ]
   end
 end

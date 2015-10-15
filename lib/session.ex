@@ -11,10 +11,11 @@ defmodule Bouncer.Session do
   def adapter, do: Application.get_env(:bouncer, :adapter)
 
   @doc """
-  Creates a session for a given user and saves it to the session store.
+  Creates a session for a given user and saves it to the session store. Returns
+  the session token which will be used as the API authorization token.
   """
   def create(conn, user) do
-    Poison.encode! user
+    Poison.encode!(user)
     |> save(Phoenix.Token.sign(conn, "user", user.id))
   end
 
