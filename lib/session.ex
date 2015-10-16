@@ -66,16 +66,22 @@ defmodule Bouncer.Session do
   request matches the given User ID.
 
   ## examples
-      iex> Bouncer.Session.user_request? %{assigns: %{current_user: %{id: 1}}}, 1
+      iex> Bouncer.Session.user_request? %{assigns: %{current_user: %{id: 1}}},
+      ...> 1
       true
-      iex> Bouncer.Session.user_request? %{assigns: %{current_user: %{id: 1}}}, 2
+      iex> Bouncer.Session.user_request? %{assigns: %{current_user: %{id: 1}}},
+      ...> "1"
+      true
+      iex> Bouncer.Session.user_request? %{assigns: %{current_user: %{id: 1}}},
+      ...> "2"
       false
       iex> Bouncer.Session.user_request? %{assigns: %{}}, 1
       false
   """
   def user_request?(conn, id) do
+    if is_bitstring(id), do: {id, _} = Integer.parse(id)
     Map.has_key?(conn.assigns, :current_user) &&
     Map.has_key?(conn.assigns.current_user, :id) &&
-    conn.assigns.current_user.id === id
+    conn.assigns.current_user.id == id
   end
 end
