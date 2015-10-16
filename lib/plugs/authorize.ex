@@ -15,51 +15,48 @@ defmodule Bouncer.Plugs.Authorize do
   end
 
   @doc """
-  Scans a connection for an authroization token, uses the token to retrieve
-  a user, adds it to the connection, and returns the connection.
+  Extracts an authorization token from the request header and adds it back into
+  the connection. Retreives a user's session information from the session store
+  using the authorization token and adds that information back into the
+  connection.
   """
   def call(conn, _) do
-    token = conn |> get_authorization_header |> get_authorization_token
-
-    case conn |> Session.get(token) |> add_user_to_connection(conn) do
-      {:ok, conn} -> conn
-
-      # TODO Figure out what to do with errors
-      {:error, _} -> conn
-    end
+    conn |> assign_auth_token |> Session.assign_current_user
   end
 
   @doc """
-  Returns the value of the request authorization header.
+  Extracts the authorization header from the connection, extracts the
+  authorization token from the header, and finally adds the token to the
+  connection.
   """
-  def get_authorization_header(conn) do
+  def assign_auth_token(conn) do
+    conn |> get_auth_header |> get_auth_token |> assign_auth_token(conn)
+  end
+
+  @doc """
+  Assigns the extracted authorization token to the connection.
+  """
+  def assign_auth_token(token, conn) do
+    if token, do: Conn.assign(conn, :auth_token, token), else: conn
+  end
+
+  @doc """
+  Extracts the value of the request authorization header.
+  """
+  def get_auth_header(conn) do
     List.first(Conn.get_req_header(conn, "authorization"))
   end
 
   @doc """
-  Pulls the authorization token out of the request header value.
+  Extracts the authorization token out of the request header value.
 
   ## Examples
-      iex> Bouncer.Plugs.Authorize.get_authorization_token "Bearer: test"
+      iex> Bouncer.Plugs.Authorize.get_auth_token "Bearer: test"
       "test"
-      iex> Bouncer.Plugs.Authorize.get_authorization_token nil
+      iex> Bouncer.Plugs.Authorize.get_auth_token nil
       nil
   """
-  def get_authorization_token(header_value) do
-    case header_value do
-      nil -> nil
-      header_value -> List.last(String.split(header_value, "Bearer: "))
-    end
-  end
-
-  @doc """
-  Adds the user's session data to the connection so that the controller actions
-  that use the plug can determine what to do with the information.
-  """
-  def add_user_to_connection({status, response}, conn) do
-    case status do
-      :ok -> {:ok, Conn.assign(conn, :current_user, response)}
-      _ -> {status, response}
-    end
+  def get_auth_token(header_value) do
+    if header_value, do: List.last(String.split(header_value, "Bearer: "))
   end
 end

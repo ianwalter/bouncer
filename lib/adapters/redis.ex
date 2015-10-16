@@ -4,25 +4,31 @@ defmodule Bouncer.Adapters.Redis do
   destroy session data within Redis.
   """
 
-  def redis do
-    Application.get_env(:bouncer, :redis)
-  end
+  @doc """
+  Retrieves the Redis connection from the application config.
+  """
+  def redis, do: Application.get_env(:bouncer, :redis)
 
   @doc """
   Saves session data to Redis using a given key.
 
   ## Examples
-      iex> Bouncer.Adapters.Redis.save ~s({"id": 1}), "UdOnTkNoW"
+      iex> Bouncer.Adapters.Redis.save %{id: 1}, "UdOnTkNoW"
       {:ok, "UdOnTkNoW"}
-      iex> Bouncer.Adapters.Redis.save ~s({"id": 2}), nil
+      iex> Bouncer.Adapters.Redis.save %{id: 2}, nil
       {:error, "wrong number of arguments"}
       iex> Bouncer.Adapters.Redis.save nil, 3
       {:error, "wrong number of arguments"}
   """
   def save(data, key) do
-    case redis().command(~w(SET) ++ [key] ++ [data]) do
-      {:ok, _} -> {:ok, key}
-      {_, response} -> {:error, response}
+    case {data, key} do
+      {nil, _} -> {:error, "wrong number of arguments"}
+      {_, nil} -> {:error, "wrong number of arguments"}
+      {_, _} ->
+        case redis.command(~w(SET) ++ [key] ++ [Poison.encode! data]) do
+          {:ok, _} -> {:ok, key}
+          {_, response} -> {:error, response}
+        end
     end
   end
 
@@ -31,16 +37,16 @@ defmodule Bouncer.Adapters.Redis do
 
   ## Examples
       iex> Bouncer.Adapters.Redis.get "UdOnTkNoW"
-      {:ok, ~s({"id": 1})}
+      {:ok, %{id: 1}}
       iex> Bouncer.Adapters.Redis.get "test"
       {:error, nil}
       iex> Bouncer.Adapters.Redis.get nil
       {:error, "wrong number of arguments"}
   """
   def get(key) do
-    case redis().command(~w(GET) ++ [key]) do
+    case redis.command(~w(GET) ++ [key]) do
       {:ok, nil}  -> {:error, nil}
-      {:ok, data} -> {:ok, data}
+      {:ok, data} -> {:ok, Poison.Parser.parse!(data, keys: :atoms!)}
       {_, response} -> {:error, response}
     end
   end
@@ -57,7 +63,7 @@ defmodule Bouncer.Adapters.Redis do
       {:error, "wrong number of arguments"}
   """
   def delete(key) do
-    case redis().command(~w(DEL) ++ [key]) do
+    case redis.command(~w(DEL) ++ [key]) do
       {:ok, ^key} -> {:ok, key}
       {_, response} -> {:error, response}
     end

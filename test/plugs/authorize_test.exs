@@ -13,12 +13,13 @@ defmodule Plugs.AuthorizeTest do
     {:ok, conn: %Conn{}}
   end
 
-  test "no data is added when no auth header is specified", %{conn: conn} do
+  test "no data is added when no auth header received", %{conn: conn} do
     conn = Authorize.call(conn, nil)
+    refute Map.has_key?(conn.assigns, :auth_token)
     refute Map.has_key?(conn.assigns, :current_user)
   end
 
-  test "no data is added when bogus auth header is specified", %{conn: conn} do
+  test "no user data is added when bogus auth token received", %{conn: conn} do
     with_mock Phoenix.Token, MockToken.keyword_list do
       conn = conn
       |> Conn.put_req_header("authorization", "Bearer: test")
@@ -28,7 +29,7 @@ defmodule Plugs.AuthorizeTest do
     end
   end
 
-  test "session data is added when correct auth header is specified",
+  test "user data is added when correct auth header is specified",
     %{conn: conn} do
 
     with_mock Phoenix.Token, MockToken.keyword_list do
@@ -36,7 +37,8 @@ defmodule Plugs.AuthorizeTest do
       |> Conn.put_req_header("authorization", "Bearer: UdOnTkNoW")
       |> Bouncer.Plugs.Authorize.call(nil)
 
-      assert Map.has_key?(conn.assigns, :current_user)
+      assert conn.assigns.auth_token == "UdOnTkNoW"
+      assert conn.assigns.current_user == %{id: 1}
     end
 
   end

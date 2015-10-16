@@ -32,7 +32,7 @@ installed as:
 
     ```elixir
     def deps do
-      [{:bouncer, "~> 0.0.3"}]
+      [{:bouncer, "~> 0.0.4"}]
     end
     ```
 
@@ -47,12 +47,16 @@ installed as:
 ## Requirements & Configuration
 
 Bouncer only has one session store adapter so far: [Redis](http://redis.io/).
-Add the following configuration once you have Redis set up:
+Here, I'm using [Redix](https://github.com/whatyouhide/redix) and the example in
+it's docs to set up a connection pool to Redis. I then add the RedixPool module
+(which is a [Supervisor](http://elixir-lang.org/docs/v1.1/elixir/Supervisor.html))
+to my applications supervisor tree so that it connects when the application
+starts up. Add the following configuration once you have this set up:
 
 ```elixir
 config :bouncer,
   adapter: Bouncer.Adapters.Redis,
-  redis: "Enter your Redis connection pool here"
+  redis: MyApp.RedixPool
 ```
 
 Bouncer also requires the [Phoenix framework]() because it uses it's Token
@@ -99,7 +103,18 @@ defmodule MyApp.SessionController do
   plug Bouncer.Plugs.Authorize when action in [:delete]
 
   def create(conn, %{"user" => user_params}) do
-    # TODO
+    case user = Repo.get_by(User, %{username: user_params.username}) do
+      nil -> send_resp(conn, :bad_request, "")
+
+      user ->
+        if Comeonin.checkpw(user_params.password, user.encrypted_password) do
+          user_map = User.to_map(user, true)
+          {_, token} = Session.create(conn, user_map)
+          render(UserView, "create.json", user: user_map, token: token)
+        else
+          send_resp(conn, :bad_request, "")
+        end
+    end
   end
 
   def delete(conn) do
