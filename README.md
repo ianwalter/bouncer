@@ -69,23 +69,10 @@ for certain controllers and/or controller actions:
 plug Bouncer.Plugs.Authorize when action in [:show, :update, :delete]
 ```
 
-## Session API
+## Documentation
 
-This is a summary of the Session API. Full package documentation is available at
-https://hexdocs.pm/bouncer
-
-#### Session.create(conn, user)
-
-Creates a session for a given user and saves it to the session store. Returns
-the session token which will be used as the API authorization token.
-
-#### Session.get(conn, token)
-
-Retrieves session data given a token (key) and assigns it to the connection.
-
-#### Session.destroy(key)
-
-Destroys a session by removing session data from the store.
+The source is really small so reading through it should be straight-forward but
+the full package documentation is available at https://hexdocs.pm/bouncer.
 
 ## Example of a SessionController
 
@@ -103,8 +90,10 @@ defmodule MyApp.SessionController do
   plug Bouncer.Plugs.Authorize when action in [:delete]
 
   def create(conn, %{"user" => user_params}) do
-    case user = Repo.get_by(User, %{username: user_params.username}) do
-      nil -> send_resp(conn, :bad_request, "")
+    case user = Repo.get_by(User, %{username: user_params["username"]}) do
+      nil ->
+        Bcrypt.dummy_checkpw()
+        send_resp(conn, :bad_request, "")
 
       user ->
         if Comeonin.checkpw(user_params.password, user.encrypted_password) do
