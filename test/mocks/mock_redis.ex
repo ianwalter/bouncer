@@ -9,7 +9,7 @@ defmodule Bouncer.MockRedis do
       ["GET", "test"] -> {:error, nil}
       ["DEL", nil] -> {:error, "wrong number of arguments"}
       ["DEL", 2] -> {:ok, 0}
-      ["DEL", key] -> {:ok, key}
+      ["DEL", key] -> {:ok, 1}
     end
   end
 end
