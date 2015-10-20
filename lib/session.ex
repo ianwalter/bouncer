@@ -6,17 +6,14 @@ defmodule Bouncer.Session do
   alias Plug.Conn
   alias Phoenix.Token
 
-  @doc """
-  Retrieves the specified session store adapter from the application config.
-  """
-  def adapter, do: Application.get_env(:bouncer, :adapter)
+  @adapter Application.get_env(:bouncer, :adapter)
 
   @doc """
   Creates a session for a given user and saves it to the session store. Returns
   the session token which will be used as the API authorization token.
   """
   def create(conn, user) do
-    user |> adapter.save(Token.sign(conn, "user", user.id))
+    user |> @adapter.save(Token.sign(conn, "user", user.id))
   end
 
   @doc """
@@ -26,7 +23,7 @@ defmodule Bouncer.Session do
   def assign_current_user(conn) do
     if Map.has_key? conn.assigns, :auth_token do
       conn.assigns.auth_token
-      |> adapter.get
+      |> @adapter.get
       |> user_matches?(conn)
       |> assign_current_user(conn)
     else
@@ -59,7 +56,7 @@ defmodule Bouncer.Session do
   @doc """
   Destroys a session by removing session data from the store.
   """
-  def destroy(key), do: adapter.delete(key)
+  def destroy(key), do: @adapter.delete(key)
 
   @doc """
   Convenience function to determine if the ID from the current_user in the

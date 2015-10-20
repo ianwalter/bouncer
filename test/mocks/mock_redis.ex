@@ -4,6 +4,9 @@ defmodule Bouncer.MockRedis do
       ["SET", nil, _] -> {:error, "wrong number of arguments"}
       ["SET", _, nil] -> {:error, "wrong number of arguments"}
       ["SET", _, _] -> {:ok, "OK"}
+      ["SADD", _, nil, _] -> {:error, "wrong number of arguments"}
+      ["SADD", _, _, nil] -> {:error, "wrong number of arguments"}
+      ["SADD", _, _, _] -> {:ok, "OK"}
       ["GET", nil] -> {:error, "wrong number of arguments"}
       ["GET", "UdOnTkNoW"] -> {:ok, ~s({"id": 1})}
       ["GET", "test"] -> {:error, nil}
