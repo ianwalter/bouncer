@@ -4,16 +4,17 @@ defmodule Bouncer.Session do
   """
 
   alias Plug.Conn
-  alias Phoenix.Token
+  alias Bouncer.Token
 
   @adapter Application.get_env(:bouncer, :adapter)
 
   @doc """
-  Creates a session for a given user and saves it to the session store. Returns
-  the session token which will be used as the API authorization token.
+  Generates a token, saves it to a data store, and adds it to the user's list of
+  tokens. The returned token can be used as the API authorization token. Default
+  time-to-live for the token is 2 weeks (in seconds).
   """
-  def create(conn, user) do
-    user |> @adapter.save(Token.sign(conn, "user", user.id))
+  def create(conn, user, ttl \\ default: 1.21e+6) do
+    Token.generate(conn, "user", user, ttl)
   end
 
   @doc """
@@ -44,19 +45,20 @@ defmodule Bouncer.Session do
   """
   def user_matches?(response, conn) do
     case response do
-      {:ok, user = %{id: id}} ->
-        case Token.verify(conn, "user", conn.assigns.auth_token) do
-          {:ok, ^id} -> user
-          _ -> nil
-        end
+      {:ok, u} -> Token.verify(conn, "user", u.id, conn.assigns.auth_token)
       _ -> nil
     end
   end
 
   @doc """
-  Destroys a session by removing session data from the store.
+  Destroys a session given a token and a user ID.
   """
-  def destroy(key), do: @adapter.delete(key)
+  def destroy(token, id), do: Token.delete(token, id)
+
+  @doc """
+  Destroys all sessions associated with a given user ID.
+  """
+  def destroy_all(id), do: Token.delete_all("user", id)
 
   @doc """
   Convenience function to determine if the ID from the current_user in the

@@ -3,13 +3,21 @@ defmodule Bouncer.EmailVerification do
   A library of functions used to work with email verification.
   """
 
-  alias Elector.Token
+  alias Bouncer.Token
 
+  @doc """
+  """
   def generate(conn, id, ttl // default: 86400) do
     Token.generate(conn, "email", id, ttl)
   end
 
+  @doc """
+  """
   def verify(conn, id, token), do: Token.verify(conn, id, "email", token)
 
-  def regenerate(conn, id, ttl), do: Token.regenerate(conn, id, ttl)
+  @doc """
+  """
+  def regenerate(conn, id, ttl // default: 86400) do
+     Token.regenerate(conn, id, "email" ttl)
+  end
 end

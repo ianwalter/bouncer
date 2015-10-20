@@ -1,7 +1,7 @@
 defmodule Bouncer.Adapters.Redis do
   @moduledoc """
-  The Redis adapter can be used by Bouncer.Session to store, retrieve, and
-  destroy session data within Redis.
+  The Redis adapter is used by Bouncer.Token to save and retrieve generated
+  tokens and associated data.
   """
 
   @doc """
@@ -10,7 +10,7 @@ defmodule Bouncer.Adapters.Redis do
   def redis, do: Application.get_env(:bouncer, :redis)
 
   @doc """
-  Saves session data to Redis using a given key.
+  Saves data to Redis using a given key.
 
   ## Examples
       iex> Bouncer.Adapters.Redis.save %{id: 1}, "UdOnTkNoW"
@@ -33,7 +33,7 @@ defmodule Bouncer.Adapters.Redis do
   end
 
   @doc """
-  Retrieves session data from Redis using a given key.
+  Retrieves data from Redis using a given key.
 
   ## Examples
       iex> Bouncer.Adapters.Redis.get "UdOnTkNoW"
@@ -52,20 +52,45 @@ defmodule Bouncer.Adapters.Redis do
   end
 
   @doc """
-
+  Adds a token to a user's collection of tokens.
 
   ## Examples
-      iex> Bouncer.Adapters.Redis.collect 1
-      {:ok, ["UdOnTkNoW"]}
-      iex> Bouncer.Adapters.Redis.collect 2
-      {:ok, []}
-      iex> Bouncer.Adapters.Redis.collect nil
-      {:error, "wrong number of arguments"}
+      iex> Bouncer.Adapters.Redis.add 1, "UdOnTkNoW"
+      {:ok, 1}
+      iex> Bouncer.Adapters.Redis.add nil
+      {:error, _}
   """
-  def collect(key), do: redis.command(~w(SMEMBERS) ++ [key])
+  def add(token, id) do
+    case redis.command(~w(SADD) ++ [id] ++ [token]) do
+      {:error, error} -> {:error, error.message}
+      response -> response
+    end
+  end
 
   @doc """
-  Destroys a session by removing the data from Redis using a given key.
+  Retrieves a user's collection of tokens given their ID.
+
+  ## Examples
+      iex> Bouncer.Adapters.Redis.all 1
+      {:ok, ["UdOnTkNoW"]}
+      iex> Bouncer.Adapters.Redis.all 2
+      {:ok, []}
+      iex> Bouncer.Adapters.Redis.all nil
+      {:error, _}
+  """
+  def all(id) do
+    case redis.command(~w(SMEMBERS) ++ [id]) do
+      {:error, error} -> {:error, error.message}
+      response -> response
+    end
+  end
+
+  @doc """
+  """
+  def remove(key, index), do: redis.command(~w(SREM) ++ [key] ++ [index])
+
+  @doc """
+  Deletes given key(s) from Redis.
 
   ## Examples
       iex> Bouncer.Adapters.Redis.delete 1
