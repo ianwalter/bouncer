@@ -32,7 +32,7 @@ installed as:
 
     ```elixir
     def deps do
-      [{:bouncer, "~> 0.0.5"}]
+      [{:bouncer, "~> 0.0.6"}]
     end
     ```
 
@@ -69,23 +69,10 @@ for certain controllers and/or controller actions:
 plug Bouncer.Plugs.Authorize when action in [:show, :update, :delete]
 ```
 
-## Session API
+## Documentation
 
-This is a summary of the Session API. Full package documentation is available at
-https://hexdocs.pm/bouncer
-
-#### Session.create(conn, user)
-
-Creates a session for a given user and saves it to the session store. Returns
-the session token which will be used as the API authorization token.
-
-#### Session.get(conn, token)
-
-Retrieves session data given a token (key) and assigns it to the connection.
-
-#### Session.destroy(key)
-
-Destroys a session by removing session data from the store.
+The source is really small so reading through it should be straight-forward but
+the full package documentation is available at https://hexdocs.pm/bouncer.
 
 ## Example of a SessionController
 
@@ -97,30 +84,42 @@ defmodule MyApp.SessionController do
   use MyApp.Web, :controller
 
   alias MyApp.User
+  alias MyApp.UserView
   alias Bouncer.Session
+  alias Comeonin.Bcrypt
 
-  plug :scrub_params, "user" when action in [:create]
   plug Bouncer.Plugs.Authorize when action in [:delete]
 
   def create(conn, %{"user" => user_params}) do
-    case user = Repo.get_by(User, %{username: user_params.username}) do
-      nil -> send_resp(conn, :bad_request, "")
+    case Repo.get_by(User, %{username: user_params["username"]}) do
+      nil ->
+        Bcrypt.dummy_checkpw()
+        send_resp(conn, :bad_request, "")
 
       user ->
-        if Comeonin.checkpw(user_params.password, user.encrypted_password) do
+        if Bcrypt.checkpw(user_params["password"], user.encrypted_password) do
           user_map = User.to_map(user, true)
           {_, token} = Session.create(conn, user_map)
-          render(UserView, "create.json", user: user_map, token: token)
+
+          conn
+          |> put_status(:created)
+          |> render(UserView, "create.json", %{user: user_map, token: token})
         else
           send_resp(conn, :bad_request, "")
         end
     end
   end
 
-  def delete(conn) do
-    case Session.destroy(conn.assigns.token) do
-      { :ok, _ } -> send_resp(conn, :no_content, "")
-      { status, response } -> send_resp(conn, :bad_request, "")
+  def delete(conn, %{"id" => id}) do
+    if Session.user_request? conn, id do
+      case Session.destroy(conn.assigns.auth_token) do
+        {:ok, _} -> send_resp(conn, :no_content, "")
+        _ -> send_resp(conn, :bad_request, "")
+      end
+    else
+      conn
+      |> put_status(:unauthorized)
+      |> render(ErrorView, "error.json")
     end
   end
 end

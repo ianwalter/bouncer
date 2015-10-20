@@ -64,7 +64,7 @@ defmodule Bouncer.Adapters.Redis do
   """
   def delete(key) do
     case redis.command(~w(DEL) ++ [key]) do
-      {:ok, ^key} -> {:ok, key}
+      {:ok, 1} -> {:ok, key}
       {_, response} -> {:error, response}
     end
   end
