@@ -52,6 +52,19 @@ defmodule Bouncer.Adapters.Redis do
   end
 
   @doc """
+
+
+  ## Examples
+      iex> Bouncer.Adapters.Redis.collect 1
+      {:ok, ["UdOnTkNoW"]}
+      iex> Bouncer.Adapters.Redis.collect 2
+      {:ok, []}
+      iex> Bouncer.Adapters.Redis.collect nil
+      {:error, "wrong number of arguments"}
+  """
+  def collect(key), do: redis.command(~w(SMEMBERS) ++ [key])
+
+  @doc """
   Destroys a session by removing the data from Redis using a given key.
 
   ## Examples
