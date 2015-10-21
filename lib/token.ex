@@ -35,13 +35,12 @@ defmodule Bouncer.Token do
     end
   end
 
-  @doc """
-  Verifies that a given token is valid and returns it otherwise returns nil.
-  """
-  defp verify(token, conn, namespace) do
-    case Token.verify(conn, namespace, token) do
-      {:ok, _} -> token
-      {_, _} -> nil
+  defp verify(conn, namespace) do
+    fn (token) ->
+      case Token.verify(conn, namespace, token) do
+        {:ok, _} -> token
+        {_, _} -> nil
+      end
     end
   end
 
@@ -49,11 +48,8 @@ defmodule Bouncer.Token do
   Gets rid of any existing tokens given a namespace and user ID. Generates and
   returns a new token.
   """
-  def regenerate(conn, namespace, id) do
-    # Get rid of existing tokens
-    delete_all(namespace, id)
-    # Generate a new token
-    generate(conn, namespace, id)
+  def regenerate(conn, namespace, id, ttl) do
+    conn |> delete_all(namespace, id) |> generate(namespace, id, ttl)
   end
 
 
@@ -61,8 +57,9 @@ defmodule Bouncer.Token do
   Deletes and removes from a user's list of tokens all tokens of a given
   namespace.
   """
-  def delete_all(namespace, id) do
+  def delete_all(conn, namespace, id) do
     Enum.map(@adapter.all(id), verify(conn, namespace)) |> delete(id)
+    conn
   end
 
   @doc """

@@ -10,25 +10,39 @@ defmodule Bouncer.Adapters.Redis do
   def redis, do: Application.get_env(:bouncer, :redis)
 
   @doc """
-  Saves data to Redis using a given key.
+  Saves data to Redis using a given key. If ttl is not nil, the value  will be
+  converted from seconds to miliseconds and set as the key's time-to-live.
 
   ## Examples
-      iex> Bouncer.Adapters.Redis.save %{id: 1}, "UdOnTkNoW"
+      iex> Bouncer.Adapters.Redis.save %{id: 1}, "UdOnTkNoW", nil
       {:ok, "UdOnTkNoW"}
-      iex> Bouncer.Adapters.Redis.save %{id: 2}, nil
+      iex> Bouncer.Adapters.Redis.save %{id: 2}, nil, nil
       {:error, "wrong number of arguments"}
-      iex> Bouncer.Adapters.Redis.save nil, 3
+      iex> Bouncer.Adapters.Redis.save nil, 3, nil
       {:error, "wrong number of arguments"}
+      iex> Bouncer.Adapters.Redis.save %{id: 2}, 2, 86400
+      {:error, "Could not set TTL, key 2 not found"}
   """
-  def save(data, key) do
+  def save(data, key, ttl) do
     case {data, key} do
       {nil, _} -> {:error, "wrong number of arguments"}
       {_, nil} -> {:error, "wrong number of arguments"}
       {_, _} ->
+
         case redis.command(~w(SET) ++ [key] ++ [Poison.encode! data]) do
-          {:ok, _} -> {:ok, key}
+          {:ok, _} ->
+
+            if ttl do
+              case redis.command(~w(EXPIRE) ++ [key] ++ [ttl * 1000]) do
+                {:ok, 1} -> {:ok, key}
+                {:ok, 0} -> {:error, "Could not set TTL, key #{key} not found"}
+                {_, response} -> {:error, response}
+              end
+            end
+
           {_, response} -> {:error, response}
         end
+
     end
   end
 
@@ -57,10 +71,8 @@ defmodule Bouncer.Adapters.Redis do
   ## Examples
       iex> Bouncer.Adapters.Redis.add 1, "UdOnTkNoW"
       {:ok, 1}
-      iex> Bouncer.Adapters.Redis.add nil
-      {:error, _}
   """
-  def add(token, id) do
+  def add(id, token) do
     case redis.command(~w(SADD) ++ [id] ++ [token]) do
       {:error, error} -> {:error, error.message}
       response -> response
@@ -75,8 +87,6 @@ defmodule Bouncer.Adapters.Redis do
       {:ok, ["UdOnTkNoW"]}
       iex> Bouncer.Adapters.Redis.all 2
       {:ok, []}
-      iex> Bouncer.Adapters.Redis.all nil
-      {:error, _}
   """
   def all(id) do
     case redis.command(~w(SMEMBERS) ++ [id]) do

@@ -7,7 +7,7 @@ defmodule Bouncer.EmailVerification do
 
   @doc """
   """
-  def generate(conn, id, ttl // default: 86400) do
+  def generate(conn, id, ttl \\ 86400) do
     Token.generate(conn, "email", id, ttl)
   end
 
@@ -17,7 +17,7 @@ defmodule Bouncer.EmailVerification do
 
   @doc """
   """
-  def regenerate(conn, id, ttl // default: 86400) do
-     Token.regenerate(conn, id, "email" ttl)
+  def regenerate(conn, id, ttl \\ 86400) do
+     Token.regenerate(conn, id, "email", ttl)
   end
 end

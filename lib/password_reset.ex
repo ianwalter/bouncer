@@ -7,7 +7,7 @@ defmodule Bouncer.PasswordReset do
 
   @doc """
   """
-  def generate(conn, id, ttl // default: 86400) do
+  def generate(conn, id, ttl \\ 86400) do
     Token.generate(conn, "password", id, ttl)
   end
 
@@ -17,7 +17,7 @@ defmodule Bouncer.PasswordReset do
 
   @doc """
   """
-  def regenerate(conn, id, ttl // default: 86400) do
-     Token.regenerate(conn, id, "password" ttl)
+  def regenerate(conn, id, ttl \\ 86400) do
+     Token.regenerate(conn, id, "password", ttl)
   end
 end

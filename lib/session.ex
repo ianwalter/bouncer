@@ -13,7 +13,7 @@ defmodule Bouncer.Session do
   tokens. The returned token can be used as the API authorization token. Default
   time-to-live for the token is 2 weeks (in seconds).
   """
-  def create(conn, user, ttl \\ default: 1.21e+6) do
+  def create(conn, user, ttl \\ 1.21e+6) do
     Token.generate(conn, "user", user, ttl)
   end
 
