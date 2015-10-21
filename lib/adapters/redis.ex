@@ -38,6 +38,8 @@ defmodule Bouncer.Adapters.Redis do
                 {:ok, 0} -> {:error, "Could not set TTL, key #{key} not found"}
                 {_, response} -> {:error, response}
               end
+            else
+              {:ok, key}
             end
 
           {_, response} -> {:error, response}
