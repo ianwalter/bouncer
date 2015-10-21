@@ -14,7 +14,7 @@ defmodule Bouncer.Token do
   def generate(conn, namespace, user, ttl) do
     id = user.id
     token = Token.sign(conn, namespace, id)
-    case @adapter.save(token, user, ttl) do
+    case @adapter.save(user, token, ttl) do
       {:ok, ^token} ->
         case @adapter.add(id, token) do
           {:ok, ^id} -> {:ok, token}
