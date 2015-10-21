@@ -45,7 +45,7 @@ defmodule Bouncer.Session do
   """
   def user_matches?(response, conn) do
     case response do
-      {:ok, u} -> Token.verify(conn, "user", u.id, conn.assigns.auth_token)
+      {:ok, user} -> Token.verify(conn, "user", user, conn.assigns.auth_token)
       _ -> nil
     end
   end

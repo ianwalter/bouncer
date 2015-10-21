@@ -26,20 +26,25 @@ defmodule Bouncer.Token do
   end
 
   @doc """
-  Verifies that a given token is valid and matches a given user ID.
+  Verifies that a given token is valid and matches a given user's ID. Returns
+  the given user.
   """
-  def verify(conn, namespace, id, token) do
+  def verify(conn, namespace, user, token) do
+    id = user.id
     case Token.verify(conn, namespace, token) do
-      {:ok, ^id} -> {:ok, id}
-      {_, response} -> {:error, response}
+      {:ok, ^id} -> user
+      _ -> nil
     end
   end
 
-  defp verify(conn, namespace) do
+  @doc """
+  Verifies that a given token is valid. Returns the token.
+  """
+  def verify(conn, namespace) do
     fn (token) ->
       case Token.verify(conn, namespace, token) do
         {:ok, _} -> token
-        {_, _} -> nil
+        _ -> nil
       end
     end
   end
@@ -52,10 +57,9 @@ defmodule Bouncer.Token do
     conn |> delete_all(namespace, id) |> generate(namespace, id, ttl)
   end
 
-
   @doc """
   Deletes and removes from a user's list of tokens all tokens of a given
-  namespace.
+  namespace. Returns the connection.
   """
   def delete_all(conn, namespace, id) do
     Enum.map(@adapter.all(id), verify(conn, namespace)) |> delete(id)

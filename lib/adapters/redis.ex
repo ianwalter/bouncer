@@ -18,10 +18,10 @@ defmodule Bouncer.Adapters.Redis do
       {:ok, "UdOnTkNoW"}
       iex> Bouncer.Adapters.Redis.save %{id: 2}, nil, nil
       {:error, "wrong number of arguments"}
-      iex> Bouncer.Adapters.Redis.save nil, 3, nil
+      iex> Bouncer.Adapters.Redis.save nil, "UdOnTkNoW", nil
       {:error, "wrong number of arguments"}
-      iex> Bouncer.Adapters.Redis.save %{id: 2}, 2, 86400
-      {:error, "Could not set TTL, key 2 not found"}
+      iex> Bouncer.Adapters.Redis.save %{id: 2}, "test", 86400
+      {:error, "Could not set TTL, key test not found"}
   """
   def save(data, key, ttl) do
     case {data, key} do
