@@ -6,22 +6,22 @@
 
 ## Why
 
-I needed a way to authorize API requests to my Phoenix application. Addict
-didn't fit the bill since it uses Phoenix's built-in session system. Phoenix
-uses cookies to authorize requests but when dealing with an API, it's easier to
-deal with an Authorization header. Phoenix's session system also uses memory or
-ETS to store session data and this wouldn't work for my application which would
-be scaled horizontally and so would be running on multiple machines. Redis is
-great at solving this problem because it's crazy-fast and can be accessed by
-multiple machines. The ecosystem around Redis is strong so working with the
-session data is pretty easy.
+I needed a way to authorize API requests to my Phoenix application.
+[Addict](https://github.com/trenpixster/addict) didn't fit the bill since it
+uses Phoenix's built-in session system. Phoenix uses cookies to authorize
+requests but when dealing with an API, it's easier to deal with an Authorization
+header. Phoenix's session system also uses memory or ETS to store session data
+and this wouldn't work for my application which would be scaled horizontally and
+so would be running on multiple machines. Redis is great at solving this problem
+because it's crazy-fast and can be accessed by multiple machines. The ecosystem
+around Redis is strong so working with the session data is pretty easy.
 
-Guardian also wouldn't work because it uses JSON Web Tokens (JWT) as the basis
-for it's authorization scheme. JWT can work but from my understanding, you need
-a system to refresh the tokens in case your user's JWT gets into the wrong
-hands. Guardian doesn't yet provide this functionality and I personally think
-the whole concept is more flawed than the traditional session-based system which
-allows you to immediately invalidate sessions.
+[Guardian](https://github.com/hassox/guardian) also wouldn’t work because it
+uses JSON Web Tokens (JWT) as the basis for it’s authorization scheme. JWT can
+work but [I don’t believe it’s a better system than the traditional session-based system](https://medium.com/@IanWalter/ole-thank-you-for-your-response-it-s-exactly-the-kind-of-feedback-i-was-looking-for-117df9438ccc#.icimd0nwv). Guardian doesn’t provide a way of immediately invalidating
+user sessions which is something I would like to do if a user resets their
+password. I also think a user should be given the ability to invalidate
+individual sessions (GitHub handles this nicely).
 
 ## Installation
 
