@@ -15,14 +15,15 @@ defmodule TokenTest do
 
   test "token is generated", %{conn: conn} do
     with_mock Phoenix.Token, MockToken.keyword_list do
-      assert {:ok, "UdOnTkNoW"} = Token.generate(conn, "test", %{id: 1}, 86400)
+      assert {:ok, _} = Token.generate(conn, "test", %{id: 1}, 86400)
     end
   end
 
   test "valid token is verified", %{conn: conn} do
     with_mock Phoenix.Token, MockToken.keyword_list do
+      user = %{id: 1}
       {:ok, token} = Token.generate(conn, "test", user, 86400)
-      assert user = Token.verify(conn, "test", user, token)
+      assert user == Token.verify(conn, "test", user, token)
     end
   end
 
@@ -30,7 +31,7 @@ defmodule TokenTest do
     with_mock Phoenix.Token, MockToken.keyword_list do
       user = %{id: 1}
       {:ok, token} = Token.generate(conn, "test", user, 86400)
-      assert nil = Token.verify(conn, "test", %{id: 2}, token)
+      refute Token.verify(conn, "test", %{id: 2}, token)
     end
   end
 end

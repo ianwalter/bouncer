@@ -9,11 +9,10 @@ defmodule Bouncer.Session do
   @adapter Application.get_env(:bouncer, :adapter)
 
   @doc """
-  Generates a token, saves it to a data store, and adds it to the user's list of
-  tokens. The returned token can be used as the API authorization token. Default
-  time-to-live for the token is 2 weeks (in seconds).
+  Generates a session token. The ttl (time-to-live) defaults to 2 weeks.
+  See Bouncer.Token.Generate/4.
   """
-  def create(conn, user, ttl \\ 1.21e+6) do
+  def create(conn, user, ttl \\ 1210000) do
     Token.generate(conn, "user", user, ttl)
   end
 
@@ -58,7 +57,7 @@ defmodule Bouncer.Session do
   @doc """
   Destroys all sessions associated with a given user ID.
   """
-  def destroy_all(id), do: Token.delete_all("user", id)
+  def destroy_all(conn, id), do: Token.delete_all(conn, "user", id)
 
   @doc """
   Convenience function to determine if the ID from the current_user in the

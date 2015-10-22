@@ -13,35 +13,26 @@ defmodule Bouncer.Adapters.Redis do
   ## Examples
       iex> Bouncer.Adapters.Redis.save %{id: 1}, "UdOnTkNoW", nil
       {:ok, "UdOnTkNoW"}
-      iex> Bouncer.Adapters.Redis.save %{id: 2}, nil, nil
-      {:error, "wrong number of arguments"}
-      iex> Bouncer.Adapters.Redis.save nil, "UdOnTkNoW", nil
-      {:error, "wrong number of arguments"}
-      iex> Bouncer.Adapters.Redis.save %{id: 2}, "test", 86400
-      {:error, "Could not set TTL, key test not found"}
   """
   def save(data, key, ttl) do
-    case {data, key} do
-      {nil, _} -> {:error, "wrong number of arguments"}
-      {_, nil} -> {:error, "wrong number of arguments"}
-      {_, _} ->
+    {status, _} = RedixPool.command(~w(SET) ++ [key] ++ [Poison.encode! data])
+    if ttl, do: expire(key, ttl), else: {status, key}
+  end
 
-        case RedixPool.command(~w(SET) ++ [key] ++ [Poison.encode! data]) do
-          {:ok, _} ->
+  @doc """
+  Sets the TTL (time-to-live in seconds) of the given key.
 
-            if ttl do
-              case RedixPool.command(~w(EXPIRE) ++ [key] ++ [ttl * 1000]) do
-                {:ok, 1} -> {:ok, key}
-                {:ok, 0} -> {:error, "Could not set TTL, key #{key} not found"}
-                {_, response} -> {:error, response}
-              end
-            else
-              {:ok, key}
-            end
-
-          {_, response} -> {:error, response}
-        end
-
+  ## Examples
+      iex> Bouncer.Adapters.Redis.save %{id: 1}, "UdOnTkNoW", nil
+      ...> Bouncer.Adapters.Redis.expire "UdOnTkNoW", 1
+      {:ok, "UdOnTkNoW"}
+      iex> Bouncer.Adapters.Redis.expire "Arcadia", 1
+      {:error, "Could not set TTL, key 'Arcadia' not found"}
+  """
+  def expire(key, ttl) do
+    case RedixPool.command(~w(EXPIRE) ++ [key] ++ [ttl * 1000]) do
+      {:ok, 1} -> {:ok, key}
+      {:ok, 0} -> {:error, "Could not set TTL, key '#{key}' not found"}
     end
   end
 
@@ -49,70 +40,66 @@ defmodule Bouncer.Adapters.Redis do
   Retrieves data from Redis using a given key.
 
   ## Examples
-      iex> Bouncer.Adapters.Redis.get "UdOnTkNoW"
+      iex> Bouncer.Adapters.Redis.save %{id: 1},"UdOnTkNoW", nil
+      ...> Bouncer.Adapters.Redis.get "UdOnTkNoW"
       {:ok, %{id: 1}}
-      iex> Bouncer.Adapters.Redis.get "test"
+      iex> Bouncer.Adapters.Redis.get "Arcadia"
       {:error, nil}
-      iex> Bouncer.Adapters.Redis.get nil
-      {:error, "wrong number of arguments"}
   """
   def get(key) do
     case RedixPool.command(~w(GET) ++ [key]) do
-      {:ok, nil}  -> {:error, nil}
-      {:ok, data} -> {:ok, Poison.Parser.parse!(data, keys: :atoms!)}
-      {_, response} -> {:error, response}
+      {_, nil}  -> {:error, nil}
+      {_, data} -> {:ok, Poison.Parser.parse!(data, keys: :atoms!)}
     end
   end
 
   @doc """
-  Adds a token to a user's collection of tokens.
+  Adds item(s) to a Redis list identified by the given key.
 
   ## Examples
-      iex> Bouncer.Adapters.Redis.add 1, "UdOnTkNoW"
+      iex> Bouncer.Adapters.Redis.add 1, "Arcadia"
       {:ok, 1}
   """
-  def add(id, token) do
-    case RedixPool.command(~w(SADD) ++ [id] ++ [token]) do
-      {:error, error} -> {:error, error.message}
-      response -> response
-    end
-  end
+  def add(id, token), do: RedixPool.command(~w(SADD) ++ [id] ++ [token])
 
   @doc """
   Retrieves a user's collection of tokens given their ID.
 
   ## Examples
-      iex> Bouncer.Adapters.Redis.all 1
-      {:ok, ["UdOnTkNoW"]}
-      iex> Bouncer.Adapters.Redis.all 2
+      iex> Bouncer.Adapters.Redis.add 1, "UdOnTkNoW"
+      ...> Bouncer.Adapters.Redis.add 1, "Arcadia"
+      ...> Bouncer.Adapters.Redis.all 1
+      {:ok, ["UdOnTkNoW", "Arcadia"]}
+      iex> Bouncer.Adapters.Redis.add 2, "divine_hammer"
+      ...> Bouncer.Adapters.Redis.all 2
+      {:ok, ["divine_hammer"]}
+      iex> Bouncer.Adapters.Redis.all 3
       {:ok, []}
   """
   def all(id) do
-    case RedixPool.command(~w(SMEMBERS) ++ [id]) do
-      {:error, error} -> {:error, error.message}
-      response -> response
-    end
+    {_, members} = RedixPool.command(~w(SMEMBERS) ++ [id])
+    if is_list(members), do: {:ok, members}, else: {:ok, [members]}
   end
 
   @doc """
+  Removes item(s) from the Redis list identified by a given key.
   """
-  def remove(key, index), do: RedixPool.command(~w(SREM) ++ [key] ++ [index])
+  def remove(key, item), do: RedixPool.command(~w(SREM) ++ [key] ++ [item])
 
   @doc """
   Deletes given key(s) from Redis.
 
   ## Examples
-      iex> Bouncer.Adapters.Redis.delete 1
-      {:ok, 1}
-      iex> Bouncer.Adapters.Redis.delete 2
-      {:error, 0}
-      iex> Bouncer.Adapters.Redis.delete nil
-      {:error, "wrong number of arguments"}
+      iex> Bouncer.Adapters.Redis.save %{id: 1}, "UdOnTkNoW", nil
+      ...> Bouncer.Adapters.Redis.delete "UdOnTkNoW"
+      {:ok, "UdOnTkNoW"}
+      iex> Bouncer.Adapters.Redis.delete "Arcadia"
+      {:error, "Key 'Arcadia' not found"}
   """
   def delete(key) do
     case RedixPool.command(~w(DEL) ++ [key]) do
-      {:ok, 1} -> {:ok, key}
-      {_, response} -> {:error, response}
+      {:ok, 0} -> {:error, "Key '#{key}' not found"}
+      _ -> {:ok, key}
     end
   end
 end

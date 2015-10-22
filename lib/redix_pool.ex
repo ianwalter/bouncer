@@ -17,8 +17,7 @@ defmodule Bouncer.RedixPool do
       :poolboy.child_spec(
         :redix_poolboy,
         pool_opts,
-        []
-        # TODO Application.get_env(:bouncer, :redis) || []
+        Application.get_env(:bouncer, :redis) || []
       )
     ]
 

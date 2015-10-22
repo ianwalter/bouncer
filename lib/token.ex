@@ -16,12 +16,13 @@ defmodule Bouncer.Token do
     token = Token.sign(conn, namespace, id)
     case @adapter.save(user, token, ttl) do
       {:ok, ^token} ->
+
         case @adapter.add(id, token) do
           {:ok, ^id} -> {:ok, token}
-          {_, response} -> {:error, response}
+          response -> response
         end
 
-      {_, response} -> {:error, response}
+      response -> response
     end
   end
 
@@ -53,8 +54,8 @@ defmodule Bouncer.Token do
   Gets rid of any existing tokens given a namespace and user ID. Generates and
   returns a new token.
   """
-  def regenerate(conn, namespace, id, ttl) do
-    conn |> delete_all(namespace, id) |> generate(namespace, id, ttl)
+  def regenerate(conn, namespace, user, ttl) do
+    conn |> delete_all(namespace, user.id) |> generate(namespace, user, ttl)
   end
 
   @doc """
@@ -62,7 +63,11 @@ defmodule Bouncer.Token do
   namespace. Returns the connection.
   """
   def delete_all(conn, namespace, id) do
-    Enum.map(@adapter.all(id), verify(conn, namespace)) |> delete(id)
+    case @adapter.all(id) do
+      {:ok, t = [i]} -> Enum.map(t, verify(conn, namespace)) |> delete(id)
+      {:ok, t} -> Enum.map([t], verify(conn, namespace)) |> delete(id)
+      _ -> nil
+    end
     conn
   end
 

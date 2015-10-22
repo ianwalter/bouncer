@@ -9,12 +9,6 @@ defmodule Bouncer.Plugs.Authorize do
   alias Bouncer.Session
 
   @doc """
-  """
-  def init(options) do
-    options
-  end
-
-  @doc """
   Extracts an authorization token from the request header and adds it back into
   the connection. Retreives a user's session information from the session store
   using the authorization token and adds that information back into the
@@ -42,6 +36,14 @@ defmodule Bouncer.Plugs.Authorize do
 
   @doc """
   Extracts the value of the request authorization header.
+
+  ## Examples
+      iex> conn = %Plug.Conn{}
+      iex> conn = Plug.Conn.put_req_header(conn, "authorization", "Bearer: 1")
+      iex> Bouncer.Plugs.Authorize.get_auth_header conn
+      "Bearer: 1"
+      iex> Bouncer.Plugs.Authorize.get_auth_header %Plug.Conn{}
+      nil
   """
   def get_auth_header(conn) do
     List.first(Conn.get_req_header(conn, "authorization"))
