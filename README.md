@@ -118,7 +118,7 @@ defmodule MyApp.SessionController do
       user ->
         if Bcrypt.checkpw(user_params["password"], user.encrypted_password) do
           user_map = User.to_map(user, true)
-          {_, token} = Session.create(conn, user_map)
+          {_, token} = Session.generate(conn, user_map)
 
           conn
           |> put_status(:created)

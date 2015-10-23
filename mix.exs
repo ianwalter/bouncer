@@ -34,11 +34,14 @@ defmodule Bouncer.Mixfile do
   defp elixirc_paths(:test), do: ["lib", "test/mocks"]
   defp elixirc_paths(_),     do: ["lib"]
 
+  defp applications(:test), do: [:phoenix, :logger]
+  defp applications(_), do: [:logger]
+
   # Configuration for the OTP application
   #
   # Type "mix help compile.app" for more information
   def application do
-    [mod: {Bouncer, []}, applications: [:phoenix, :logger]]
+    [mod: {Bouncer, []}, applications: applications(Mix.env)]
   end
 
   # Dependencies can be Hex packages:

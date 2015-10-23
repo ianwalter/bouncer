@@ -1,6 +1,6 @@
 defmodule Plugs.AuthorizeTest do
   use ExUnit.Case
-  
+
   alias Plug.Conn
   alias Bouncer.Plugs.Authorize
   alias Bouncer.MockEndpoint
@@ -25,7 +25,7 @@ defmodule Plugs.AuthorizeTest do
     conn = conn
     |> Conn.put_req_header("authorization", "Bearer: test")
     |> Authorize.call(nil)
-    IO.inspect conn.private
+    
     refute Map.has_key?(conn.private, :current_user)
   end
 
