@@ -6,6 +6,7 @@ defmodule EmailVerificationTest do
   alias Bouncer.Adapters.Redis
   alias Bouncer.MockEndpoint
   alias Bouncer.EmailVerification
+  alias Bouncer.Token
 
   doctest Bouncer.Session
 
@@ -39,12 +40,12 @@ defmodule EmailVerificationTest do
   end
 
   test "invalid email verification token is not verified", %{conn: conn} do
-    {:ok, token} = EmailVerification.generate conn, %{id: 1}, 86400
+    {:ok, token} = Token.generate conn, "test", %{id: 1}, 86400
     assert {:error, "Invalid token"} === EmailVerification.verify conn, token
   end
 
   test "email verification token not verified when not stored", %{conn: conn} do
-    token = Phoenix.Token.sign conn, "test", 1
+    token = Phoenix.Token.sign conn, "email", 1
     assert {:error, nil} === EmailVerification.verify conn, token
   end
 end

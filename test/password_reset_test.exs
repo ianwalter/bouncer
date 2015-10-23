@@ -6,6 +6,7 @@ defmodule PasswordResetTest do
   alias Bouncer.Adapters.Redis
   alias Bouncer.MockEndpoint
   alias Bouncer.PasswordReset
+  alias Bouncer.Token
 
   doctest Bouncer.Session
 
@@ -39,12 +40,12 @@ defmodule PasswordResetTest do
   end
 
   test "invalid password reset token is not verified", %{conn: conn} do
-    {:ok, token} = PasswordReset.generate conn, %{id: 1}, 86400
+    {:ok, token} = Token.generate conn, "test", %{id: 1}, 86400
     assert {:error, "Invalid token"} === PasswordReset.verify conn, token
   end
 
   test "password reset token not verified when not stored", %{conn: conn} do
-    token = Phoenix.Token.sign conn, "test", 1
+    token = Phoenix.Token.sign conn, "password", 1
     assert {:error, nil} === PasswordReset.verify conn, token
   end
 end

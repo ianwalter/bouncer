@@ -43,8 +43,8 @@ defmodule Bouncer.Session do
   @doc """
   Puts the user session data into the connection.
   """
-  def put_current_user({_, user}, conn) do
-    if user, do: Conn.put_private(conn, :current_user, user), else: conn
+  def put_current_user({status, u}, conn) do
+    if status === :ok, do: Conn.put_private(conn, :current_user, u), else: conn
   end
 
   @doc """
