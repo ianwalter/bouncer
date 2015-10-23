@@ -12,6 +12,8 @@
   Bouncer.PasswordReset module to generate password reset tokens.
 * #5: Use real Redis instance for testing. Also added a Supervisor and
   RedixPool module so that it's easier for users to get started.
+* #10: Use private instead of assigns as suggested by Plug documentation.
+* #11: Mock Endpoint instead of Phoenix.Token.
 
 ## v0.0.6
 
