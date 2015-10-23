@@ -14,15 +14,15 @@ defmodule Bouncer.EmailVerification do
 
   @doc """
   Verifies an email verification token is valid and matches the given user ID.
-  See Bouncer.Token.Verify/4.
+  See Bouncer.Token.Verify/3.
   """
-  def verify(conn, token), do: Token.verify(conn, token, "email")
+  def verify(conn, token), do: Token.verify(conn, "email", token)
 
   @doc """
   Removes any previous email verification tokens and generates a new one. See
   Bouncer.Token.regenerate/4.
   """
   def regenerate(conn, user, ttl \\ 86400) do
-     Token.regenerate(conn, user, "email", ttl)
+     Token.regenerate(conn, "email", user, ttl)
   end
 end

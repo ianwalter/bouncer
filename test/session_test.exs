@@ -1,66 +1,58 @@
 defmodule SessionTest do
   use ExUnit.Case
 
-  import Mock
-
   alias Plug.Conn
   alias Bouncer.RedixPool
   alias Bouncer.Adapters.Redis
   alias Bouncer.Session
-  alias Bouncer.MockToken
+  alias Bouncer.MockEndpoint
   alias Bouncer.Plugs.Authorize
 
   doctest Bouncer.Session
 
   setup do
     on_exit fn -> RedixPool.command(~w(FLUSHALL)) end
-    {:ok, conn: %Conn{}}
+    {:ok, conn: %Conn{} |> Conn.put_private(:phoenix_endpoint, MockEndpoint)}
   end
 
-  test "session is created", %{conn: conn} do
-    with_mock Phoenix.Token, MockToken.keyword_list do
-      user = %{id: 1}
-      {:ok, token} = Session.create conn, user
+  test "session is generated", %{conn: conn} do
+    user = %{id: 1}
+    {:ok, token} = Session.generate conn, user
 
-      assert Redis.all 1 == {:ok, [token]}
-      assert {:ok, user} == Redis.get(token)
-    end
+    assert {:ok, [token]} === Redis.all 1
+    assert {:ok, user} === Redis.get token
   end
 
-  test "user can be assigned to the connection", %{conn: conn} do
-    with_mock Phoenix.Token, MockToken.keyword_list do
-      user = %{id: 1}
-      {:ok, token} = Session.create conn, user
+  test "current_user can be put into the connection", %{conn: conn} do
+    user = %{id: 1}
+    {:ok, token} = Session.generate conn, user
 
-      conn = conn
-      |> Conn.put_req_header("authorization", "Bearer: #{token}")
-      |> Authorize.assign_auth_token
-      |> Session.assign_current_user
+    conn = conn
+    |> Conn.put_req_header("authorization", "Bearer: #{token}")
+    |> Authorize.put_auth_token
+    |> Session.put_current_user
 
-      assert conn.private.current_user == user
-    end
+    assert conn.private.current_user == user
   end
 
   test "session is destroyed", %{conn: conn} do
-    with_mock Phoenix.Token, MockToken.keyword_list do
-      {:ok, token} = Session.create conn, %{id: 1}
+    user = %{id: 1}
+    {:ok, token} = Session.generate conn, user
 
-      assert {:ok, token} == Session.destroy token, 1
-      assert Redis.all 1 == {:ok, []}
-      assert {:error, nil} == Redis.get token
-    end
+    assert {:ok, 1} === Session.destroy token, user.id
+    assert {:ok, []} === Redis.all user.id
+    assert {:error, nil} === Redis.get token
   end
 
   test "all user sessions are destroyed", %{conn: conn} do
-    with_mock Phoenix.Token, MockToken.keyword_list do
-      {:ok, tokenOne} = Session.create conn, %{id: 1}
-      {:ok, tokenTwo} = Session.create conn, %{id: 1}
+    user = %{id: 1}
+    {:ok, tokenOne} = Session.generate conn, user
+    {:ok, tokenTwo} = Session.generate conn, user
 
-      Session.destroy_all conn, 1
+    Session.destroy_all conn, user.id
 
-      assert Redis.all 1 == {:ok, []}
-      assert {:error, nil} == Redis.get tokenOne
-      assert {:error, nil} == Redis.get tokenTwo
-    end
+    assert {:ok, []} === Redis.all 1
+    assert {:error, nil} === Redis.get tokenOne
+    assert {:error, nil} === Redis.get tokenTwo
   end
 end

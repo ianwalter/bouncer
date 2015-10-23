@@ -42,7 +42,7 @@ be installed as:
 
     ```elixir
     def deps do
-      [{:bouncer, "~> 0.0.6"}]
+      [{:bouncer, "~> 0.1.0"}]
     end
     ```
 
@@ -94,7 +94,7 @@ the full package documentation is available at https://hexdocs.pm/bouncer.
 ## Example of a SessionController
 
 Here's and example of how you can use the
-[Bouncer.Session](http://hexdocs.pm/bouncer/stable/Bouncer.Session.html) API in
+[Bouncer.Session](http://hexdocs.pm/bouncer/0.1.0/Bouncer.Session.html) API in
 your application:
 
 ```elixir

@@ -77,17 +77,45 @@ defmodule Bouncer.Adapters.Redis do
       {:ok, []}
   """
   def all(id) do
-    {_, members} = RedixPool.command(~w(SMEMBERS) ++ [id])
-    if is_list(members), do: {:ok, members}, else: {:ok, [members]}
+    case RedixPool.command(~w(SMEMBERS) ++ [id]) do
+      {_, members} when members === nil -> {:ok, []}
+      {_, members} when is_bitstring(members) -> {:ok, [members]}
+      {_, members} -> {:ok, members}
+    end
   end
 
   @doc """
   Removes item(s) from the Redis list identified by a given key.
   """
+  def remove(key, items) when is_list(items) do
+    RedixPool.command(~w(SREM) ++ [key] ++ items)
+  end
+
+  @doc """
+  Removes a item from the Redis list identified by a given key.
+  """
   def remove(key, item), do: RedixPool.command(~w(SREM) ++ [key] ++ [item])
 
   @doc """
   Deletes given key(s) from Redis.
+
+  ## Examples
+      iex> Bouncer.Adapters.Redis.save %{id: 1}, "UdOnTkNoW", nil
+      ...> Bouncer.Adapters.Redis.save %{id: 2}, "Arcadia", nil
+      ...> Bouncer.Adapters.Redis.delete ["UdOnTkNoW", "Arcadia"]
+      {:ok, ["UdOnTkNoW", "Arcadia"]}
+      iex> Bouncer.Adapters.Redis.delete []
+      {:error, "Keys '[]' not found"}
+  """
+  def delete(keys) when is_list(keys) do
+    case RedixPool.command(~w(DEL) ++ keys) do
+      {:ok, 0} -> {:error, "Keys '#{keys}' not found"}
+      _ -> {:ok, keys}
+    end
+  end
+
+  @doc """
+  Deletes a given key from Redis.
 
   ## Examples
       iex> Bouncer.Adapters.Redis.save %{id: 1}, "UdOnTkNoW", nil

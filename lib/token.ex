@@ -30,8 +30,8 @@ defmodule Bouncer.Token do
   Verifies that a given token is valid and matches a given ID. If the token is
   valid, returns the data retrieved from the store using the token as a key.
   """
-  def verify(conn, token, namespace) do
-    case validate([token, conn, namespace]) do
+  def verify(conn, namespace, token) do
+    case validate([conn, namespace, token]) do
       ^token -> @adapter.get(token)
       false -> {:error, "Invalid token"}
     end
@@ -41,8 +41,8 @@ defmodule Bouncer.Token do
   Validates a token against a given namespace and optionally an ID. Returns
   the token if valid.
   """
-  def validate([conn, token, namespace]) do
-    case Token.verify(conn, token, namespace) do
+  def validate([conn, namespace, token]) do
+    case Token.verify(conn, namespace, token) do
       {:ok, _} -> token
       _ -> false
     end
@@ -63,17 +63,18 @@ defmodule Bouncer.Token do
   def delete_all(conn, namespace, id) do
     case @adapter.all(id) do
       {_, tokens} ->
-        Enum.map(tokens, &([conn, &1, namespace]))
-        |> Enum.filter(&validate/1)
+        Enum.map(tokens, &([conn, namespace, &1]))
+        |> Enum.filter_map(&validate/1, fn ([_, _, token]) -> token end)
         |> delete(id)
     end
+    conn
   end
 
   @doc """
   Deletes a token and disassociates them with the given ID.
   """
   def delete(token, id) do
-    @adapter.remove(id, token)
     @adapter.delete(token)
+    @adapter.remove(id, token)
   end
 end

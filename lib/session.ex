@@ -20,7 +20,7 @@ defmodule Bouncer.Session do
   Verifies a session token is valid and matches the given user. See
   Bouncer.Token.Verify/4.
   """
-  def verify(conn, token), do: Token.verify(conn, token, "user")
+  def verify(conn, token), do: Token.verify(conn, "user", token)
 
 
   @doc """
