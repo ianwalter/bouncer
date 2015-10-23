@@ -8,45 +8,43 @@ defmodule Bouncer.Token do
   @adapter Application.get_env(:bouncer, :adapter)
 
   @doc """
-  Generates a token, saves it to a data store, and adds it to the user's list of
-  tokens.
+  Generates a token, uses it as a key to save user data to the store, and
+  associates it with the user's ID.
   """
   def generate(conn, namespace, user, ttl) do
-    id = user.id
-    token = Token.sign(conn, namespace, id)
+    token = Token.sign(conn, namespace, user.id)
     case @adapter.save(user, token, ttl) do
-      {:ok, ^token} ->
 
-        case @adapter.add(id, token) do
-          {:ok, ^id} -> {:ok, token}
+      {:ok, ^token} ->
+        case @adapter.add(user.id, token) do
+          {:ok, _} -> {:ok, token}
           response -> response
         end
 
       response -> response
+
     end
   end
 
   @doc """
-  Verifies that a given token is valid and matches a given user's ID. Returns
-  the given user.
+  Verifies that a given token is valid and matches a given ID. If the token is
+  valid, returns the data retrieved from the store using the token as a key.
   """
-  def verify(conn, namespace, user, token) do
-    id = user.id
-    case Token.verify(conn, namespace, token) do
-      {:ok, ^id} -> user
-      _ -> nil
+  def verify(conn, token, namespace) do
+    case validate([token, conn, namespace]) do
+      ^token -> @adapter.get(token)
+      false -> {:error, "Invalid token"}
     end
   end
 
   @doc """
-  Verifies that a given token is valid. Returns the token.
+  Validates a token against a given namespace and optionally an ID. Returns
+  the token if valid.
   """
-  def verify(conn, namespace) do
-    fn (token) ->
-      case Token.verify(conn, namespace, token) do
-        {:ok, _} -> token
-        _ -> nil
-      end
+  def validate([conn, token, namespace]) do
+    case Token.verify(conn, token, namespace) do
+      {:ok, _} -> token
+      _ -> false
     end
   end
 
@@ -59,20 +57,20 @@ defmodule Bouncer.Token do
   end
 
   @doc """
-  Deletes and removes from a user's list of tokens all tokens of a given
-  namespace. Returns the connection.
+  Deletes all tokens of a given namespace and disassociates them with the given
+  ID.
   """
   def delete_all(conn, namespace, id) do
     case @adapter.all(id) do
-      {:ok, t = [i]} -> Enum.map(t, verify(conn, namespace)) |> delete(id)
-      {:ok, t} -> Enum.map([t], verify(conn, namespace)) |> delete(id)
-      _ -> nil
+      {_, tokens} ->
+        Enum.map(tokens, &([conn, &1, namespace]))
+        |> Enum.filter(&validate/1)
+        |> delete(id)
     end
-    conn
   end
 
   @doc """
-  Deletes a token and removes it from the user's list of tokens.
+  Deletes a token and disassociates them with the given ID.
   """
   def delete(token, id) do
     @adapter.remove(id, token)

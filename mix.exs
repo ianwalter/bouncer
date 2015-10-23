@@ -38,7 +38,7 @@ defmodule Bouncer.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [mod: {Bouncer, []}, applications: [:logger]]
+    [mod: {Bouncer, []}, applications: [:phoenix, :logger]]
   end
 
   # Dependencies can be Hex packages:

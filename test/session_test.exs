@@ -37,14 +37,14 @@ defmodule SessionTest do
       |> Authorize.assign_auth_token
       |> Session.assign_current_user
 
-      assert conn.assigns.current_user == user
+      assert conn.private.current_user == user
     end
   end
 
   test "session is destroyed", %{conn: conn} do
     with_mock Phoenix.Token, MockToken.keyword_list do
       {:ok, token} = Session.create conn, %{id: 1}
-      
+
       assert {:ok, token} == Session.destroy token, 1
       assert Redis.all 1 == {:ok, []}
       assert {:error, nil} == Redis.get token

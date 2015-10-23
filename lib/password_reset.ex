@@ -8,15 +8,15 @@ defmodule Bouncer.PasswordReset do
   @doc """
   Generates a password reset token. See Bouncer.Token.Generate/4.
   """
-  def generate(conn, id, ttl \\ 86400) do
-    Token.generate(conn, "password", id, ttl)
+  def generate(conn, user, ttl \\ 86400) do
+    Token.generate(conn, "password", user, ttl)
   end
 
   @doc """
-  Verifies a password reset token is valid and matches the given user. See
+  Verifies a password reset token is valid and matches the given user ID. See
   Bouncer.Token.Verify/4.
   """
-  def verify(conn, user, token), do: Token.verify(conn, user, "password", token)
+  def verify(conn, token), do: Token.verify(conn, token, "password")
 
   @doc """
   Removes any previous password reset tokens and generates a new one. See
