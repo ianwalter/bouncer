@@ -9,7 +9,7 @@ defmodule Bouncer.RedixPool do
     pool_opts = [
       name: {:local, :redix_poolboy},
       worker_module: Redix,
-      size: 10,
+      size: Application.get_env(:bouncer, :pool_size) || 10,
       max_overflow: 5,
     ]
 

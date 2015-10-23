@@ -66,10 +66,6 @@ defmodule Bouncer.Adapters.Redis do
   Retrieves a user's collection of tokens given their ID.
 
   ## Examples
-      iex> Bouncer.Adapters.Redis.add 1, "UdOnTkNoW"
-      ...> Bouncer.Adapters.Redis.add 1, "Arcadia"
-      ...> Bouncer.Adapters.Redis.all 1
-      {:ok, ["UdOnTkNoW", "Arcadia"]}
       iex> Bouncer.Adapters.Redis.add 2, "divine_hammer"
       ...> Bouncer.Adapters.Redis.all 2
       {:ok, ["divine_hammer"]}
