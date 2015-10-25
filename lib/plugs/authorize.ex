@@ -9,19 +9,13 @@ defmodule Bouncer.Plugs.Authorize do
   alias Bouncer.Session
 
   @doc """
-  """
-  def init(options) do
-    options
-  end
-
-  @doc """
   Extracts an authorization token from the request header and adds it back into
   the connection. Retreives a user's session information from the session store
   using the authorization token and adds that information back into the
   connection.
   """
   def call(conn, _) do
-    conn |> assign_auth_token |> Session.assign_current_user
+    conn |> put_auth_token |> Session.put_current_user
   end
 
   @doc """
@@ -29,19 +23,27 @@ defmodule Bouncer.Plugs.Authorize do
   authorization token from the header, and finally adds the token to the
   connection.
   """
-  def assign_auth_token(conn) do
-    conn |> get_auth_header |> get_auth_token |> assign_auth_token(conn)
+  def put_auth_token(conn) do
+    conn |> get_auth_header |> get_auth_token |> put_auth_token(conn)
   end
 
   @doc """
-  Assigns the extracted authorization token to the connection.
+  Puts the extracted authorization token into the connection.
   """
-  def assign_auth_token(token, conn) do
-    if token, do: Conn.assign(conn, :auth_token, token), else: conn
+  def put_auth_token(token, conn) do
+    if token, do: Conn.put_private(conn, :auth_token, token), else: conn
   end
 
   @doc """
   Extracts the value of the request authorization header.
+
+  ## Examples
+      iex> conn = %Plug.Conn{}
+      iex> conn = Plug.Conn.put_req_header(conn, "authorization", "Bearer: 1")
+      iex> Bouncer.Plugs.Authorize.get_auth_header conn
+      "Bearer: 1"
+      iex> Bouncer.Plugs.Authorize.get_auth_header %Plug.Conn{}
+      nil
   """
   def get_auth_header(conn) do
     List.first(Conn.get_req_header(conn, "authorization"))

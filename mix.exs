@@ -19,7 +19,7 @@ defmodule Bouncer.Mixfile do
   def project do
     [
       app: :bouncer,
-      version: "0.0.6",
+      version: "0.1.0",
       elixir: ">= 1.0.0",
       elixirc_paths: elixirc_paths(Mix.env),
       build_embedded: Mix.env == :prod,
@@ -34,11 +34,14 @@ defmodule Bouncer.Mixfile do
   defp elixirc_paths(:test), do: ["lib", "test/mocks"]
   defp elixirc_paths(_),     do: ["lib"]
 
+  defp applications(:test), do: [:phoenix, :logger]
+  defp applications(_), do: [:logger]
+
   # Configuration for the OTP application
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger]]
+    [mod: {Bouncer, []}, applications: applications(Mix.env)]
   end
 
   # Dependencies can be Hex packages:
@@ -54,7 +57,8 @@ defmodule Bouncer.Mixfile do
     [
       {:phoenix, ">= 1.0.0"},
       {:httpoison, "~> 0.7.2"},
-      {:mock, "~> 0.1.0", only: :test},
+      {:redix, ">= 0.0.0"},
+      {:poolboy, "~> 1.4"},
       {:earmark, "~> 0.1", only: :dev},
       {:ex_doc, "~> 0.10", only: :dev}
     ]

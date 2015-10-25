@@ -5,4 +5,8 @@
 erl_crash.dump
 *.ez
 
+# OS X
 .DS_Store
+
+# Redis
+dump.rdb
