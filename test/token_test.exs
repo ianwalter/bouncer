@@ -8,7 +8,7 @@ defmodule TokenTest do
   alias Bouncer.Adapters.Redis
 
   setup do
-    on_exit fn -> RedixPool.command(~w(FLUSHALL)) end
+    RedixPool.command ~w(FLUSHALL)
     {:ok, conn: %Conn{} |> Conn.put_private(:phoenix_endpoint, MockEndpoint)}
   end
 

@@ -1,10 +1,11 @@
 defmodule Adapters.RedisTest do
   use ExUnit.Case
-  
+
   alias Bouncer.RedixPool
 
   setup do
-    on_exit fn -> RedixPool.command(~w(FLUSHALL)) end
+    RedixPool.command ~w(FLUSHALL)
+    :ok
   end
 
   doctest Bouncer.Adapters.Redis

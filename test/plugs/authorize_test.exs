@@ -10,7 +10,7 @@ defmodule Plugs.AuthorizeTest do
   doctest Bouncer.Plugs.Authorize
 
   setup do
-    on_exit fn -> RedixPool.command(~w(FLUSHALL)) end
+    RedixPool.command ~w(FLUSHALL)
     {:ok, conn: %Conn{} |> Conn.put_private(:phoenix_endpoint, MockEndpoint)}
   end
 
@@ -25,7 +25,7 @@ defmodule Plugs.AuthorizeTest do
     conn = conn
     |> Conn.put_req_header("authorization", "Bearer: test")
     |> Authorize.call(nil)
-    
+
     refute Map.has_key?(conn.private, :current_user)
   end
 
