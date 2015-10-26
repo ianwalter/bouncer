@@ -94,7 +94,7 @@ the full package documentation is available at https://hexdocs.pm/bouncer.
 ## Example of a SessionController
 
 Here's and example of how you can use the
-[Bouncer.Session](http://hexdocs.pm/bouncer/0.1.0/Bouncer.Session.html) API in
+[Bouncer.Session](http://hexdocs.pm/bouncer/Bouncer.Session.html) API in
 your application:
 
 ```elixir
