@@ -19,7 +19,7 @@ defmodule Bouncer.Mixfile do
   def project do
     [
       app: :bouncer,
-      version: "0.1.1",
+      version: "0.1.2",
       elixir: ">= 1.1.1",
       elixirc_paths: elixirc_paths(Mix.env),
       build_embedded: Mix.env == :prod,

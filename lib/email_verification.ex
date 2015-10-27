@@ -13,8 +13,8 @@ defmodule Bouncer.EmailVerification do
   end
 
   @doc """
-  Verifies an email verification token is valid and matches the given user ID.
-  See Bouncer.Token.Verify/3.
+  Verifies that a email verification token is valid. Returns associated data
+  from the store using the token as a key. See Bouncer.Token.Verify/3.
   """
   def verify(conn, token), do: Token.verify(conn, "email", token)
 

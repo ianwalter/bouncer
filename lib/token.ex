@@ -27,8 +27,8 @@ defmodule Bouncer.Token do
   end
 
   @doc """
-  Verifies that a given token is valid and matches a given ID. If the token is
-  valid, returns the data retrieved from the store using the token as a key.
+  Verifies that a given token is valid. Returns data retrieved from the store
+  using the token as a key if token is valid.
   """
   def verify(conn, namespace, token) do
     case validate([conn, namespace, token]) do
@@ -38,8 +38,8 @@ defmodule Bouncer.Token do
   end
 
   @doc """
-  Validates a token against a given namespace and optionally an ID. Returns
-  the token if valid.
+  Validates a token against a given namespace. Returns the token if valid and
+  false otherwise.
   """
   def validate([conn, namespace, token]) do
     case Token.verify(conn, namespace, token) do
