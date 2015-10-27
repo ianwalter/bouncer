@@ -2,7 +2,7 @@
 
 **Token-based authorization and session management for Phoenix (Elixir)**
 
-[![Build Status](https://semaphoreci.com/api/v1/projects/f9fd62d2-a799-4b66-8d72-06bbc290d32b/570486/shields_badge.svg)](https://semaphoreci.com/ianwalter/bouncer)
+[![Build Status](https://semaphoreci.com/api/v1/projects/f9fd62d2-a799-4b66-8d72-06bbc290d32b/570486/shields_badge.svg)](https://semaphoreci.com/ianwalter/bouncer) (Ignore until Semaphore CI updates Elixir version)
 
 ## Why
 
@@ -42,7 +42,7 @@ be installed as:
 
     ```elixir
     def deps do
-      [{:bouncer, "~> 0.1.0"}]
+      [{:bouncer, "~> 0.1.1"}]
     end
     ```
 

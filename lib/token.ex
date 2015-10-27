@@ -53,25 +53,23 @@ defmodule Bouncer.Token do
   returns a new token.
   """
   def regenerate(conn, namespace, user, ttl) do
-    conn |> delete_all(namespace, user.id) |> generate(namespace, user, ttl)
+    delete_all(conn, namespace, user.id)
+    generate(conn, namespace, user, ttl)
   end
 
   @doc """
   Deletes all tokens of a given namespace and disassociates them with the given
-  ID.
+  user's ID.
   """
   def delete_all(conn, namespace, id) do
-    case @adapter.all(id) do
-      {_, tokens} ->
-        Enum.map(tokens, &([conn, namespace, &1]))
-        |> Enum.filter_map(&validate/1, fn ([_, _, token]) -> token end)
-        |> delete(id)
-    end
-    conn
+    {_, tokens} = @adapter.all(id)
+    Enum.map(tokens, &([conn, namespace, &1]))
+    |> Enum.filter_map(&validate/1, fn ([_, _, token]) -> token end)
+    |> delete(id)
   end
 
   @doc """
-  Deletes a token and disassociates them with the given ID.
+  Deletes token(s) and disassociates them with the given user's ID.
   """
   def delete(token, id) do
     @adapter.delete(token)
