@@ -8,6 +8,8 @@ defmodule Bouncer.Plugs.Authorize do
   alias Plug.Conn
   alias Bouncer.Session
 
+  def init(options), do: options
+
   @doc """
   Extracts an authorization token from the request header and adds it back into
   the connection. Retreives a user's session information from the session store
