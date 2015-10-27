@@ -1,11 +1,16 @@
 # Changes to bouncer
 
+## v0.1.2
+
+* Adding `init/1` back to the Authorize plug after being accidentally removed.
+* Clearing up some documentation within Bouncer.EmailVerification.
+
 ## v0.1.1
 
-* Bumping required Elixir version to 1.1.1 because of odd behavior on 1.0.5
-* Fixing link to Bouncer.Session documentation in README
-* Cleaning up RedixPool config
-* Cleaning up Bouncer.Token delete_all and regenerate functions
+* Bumping required Elixir version to 1.1.1 because of odd behavior on 1.0.5.
+* Fixing link to Bouncer.Session documentation in README.
+* Cleaning up RedixPool config.
+* Cleaning up Bouncer.Token delete_all and regenerate functions.
 
 ## v0.1.0
 
