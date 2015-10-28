@@ -25,4 +25,10 @@ defmodule Bouncer.PasswordReset do
   def regenerate(conn, user, ttl \\ 86400) do
      Token.regenerate(conn, "password", user, ttl)
   end
+
+  @doc """
+  Destroys a password reset token given the token and user ID. See 
+  Bouncer.Token.delete/2.
+  """
+  def destroy(token, id), do: Token.delete(token, id)
 end

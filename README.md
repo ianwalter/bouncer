@@ -42,7 +42,7 @@ be installed as:
 
     ```elixir
     def deps do
-      [{:bouncer, "~> 0.1.2"}]
+      [{:bouncer, "~> 0.1.3"}]
     end
     ```
 
