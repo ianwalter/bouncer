@@ -24,8 +24,9 @@ defmodule EmailVerificationTest do
   end
 
   test "email verification token is regenerated", %{conn: conn} do
-    user = %{id: 4}
+    user = %{id: 2}
     {:ok, testToken} = EmailVerification.generate conn, user, 86400
+    :timer.sleep(1)
     {:ok, newToken} = EmailVerification.regenerate conn, user, 86400
 
     assert {:error, nil} === Redis.get testToken

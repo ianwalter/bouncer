@@ -45,6 +45,7 @@ defmodule TokenTest do
   test "token is regenerated and old tokens are deleted", %{conn: conn} do
     user = %{id: 4}
     {:ok, testToken} = Token.generate conn, "test", user, 86400
+    :timer.sleep(1)
     {:ok, newToken} = Token.regenerate conn, "test", user, 86400
 
     assert {:error, nil} === Redis.get testToken

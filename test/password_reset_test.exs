@@ -24,8 +24,9 @@ defmodule PasswordResetTest do
   end
 
   test "password reset token is regenerated", %{conn: conn} do
-    user = %{id: 4}
+    user = %{id: 2}
     {:ok, testToken} = PasswordReset.generate conn, user, 86400
+    :timer.sleep(1)
     {:ok, newToken} = PasswordReset.regenerate conn, user, 86400
 
     assert {:error, nil} === Redis.get testToken
