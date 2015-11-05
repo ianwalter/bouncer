@@ -1,8 +1,6 @@
-# Bouncer (alpha, not used in production yet)
+# Bouncer (beta) [![Hex Version](https://img.shields.io/hexpm/v/bouncer.svg)](https://hex.pm/packages/bouncer) [![Build Status](https://semaphoreci.com/api/v1/projects/f9fd62d2-a799-4b66-8d72-06bbc290d32b/570486/shields_badge.svg)](https://semaphoreci.com/ianwalter/bouncer)
 
 **Token-based authorization and session management for Phoenix (Elixir)**
-
-[![Build Status](https://semaphoreci.com/api/v1/projects/f9fd62d2-a799-4b66-8d72-06bbc290d32b/570486/shields_badge.svg)](https://semaphoreci.com/ianwalter/bouncer)
 
 ## Why
 
@@ -118,27 +116,25 @@ defmodule MyApp.SessionController do
       user ->
         if Bcrypt.checkpw(user_params["password"], user.encrypted_password) do
           user_map = User.to_map(user, true)
-          {_, token} = Session.generate(conn, user_map)
+          {:ok, token} = Session.generate(conn, user_map)
 
           conn
           |> put_status(:created)
-          |> render(UserView, "create.json", %{user: user_map, token: token})
+          |> render("create.json", %{user: user_map, token: token})
         else
           send_resp(conn, :bad_request, "")
         end
     end
   end
 
-  def delete(conn, %{"id" => id}) do
-    if Session.user_request? conn, id do
-      case Session.destroy(conn.private.auth_token) do
-        {:ok, _} -> send_resp(conn, :no_content, "")
-        _ -> send_resp(conn, :bad_request, "")
+  def delete conn, _params do
+    if user = conn.private.current_user do
+      case Session.destroy conn.private.auth_token, user.id do
+        {:ok, _} -> send_resp conn, :no_content, ""
+        _ -> send_resp conn, :bad_request, ""
       end
     else
-      conn
-      |> put_status(:unauthorized)
-      |> render(ErrorView, "error.json")
+      send_resp conn, :unauthorized, ""
     end
   end
 end
