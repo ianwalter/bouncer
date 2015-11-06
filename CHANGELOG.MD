@@ -1,5 +1,16 @@
 # Changes to bouncer
 
+## v0.1.4
+
+* #13: Use Poison instead of HTTPoison.
+* #14: Only include environment config file if Mix.env is :test.
+
+## v0.1.3
+
+* Adding sleep calls in tests between token generation to ensure tokens are
+  unique.
+* Adding destroy function to EmailVerification and PasswordReset modules.
+
 ## v0.1.2
 
 * Adding `init/1` back to the Authorize plug after being accidentally removed.

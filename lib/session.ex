@@ -34,10 +34,9 @@ defmodule Bouncer.Session do
   """
   def put_current_user(conn) do
     if Map.has_key? conn.private, :auth_token do
-      conn |> verify(conn.private.auth_token) |> put_current_user(conn)
-    else
-      conn
+      conn = conn |> verify(conn.private.auth_token) |> put_current_user(conn)
     end
+    conn
   end
 
   @doc """

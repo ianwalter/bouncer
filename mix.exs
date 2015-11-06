@@ -19,7 +19,7 @@ defmodule Bouncer.Mixfile do
   def project do
     [
       app: :bouncer,
-      version: "0.1.3",
+      version: "0.1.4",
       elixir: ">= 1.0.0",
       elixirc_paths: elixirc_paths(Mix.env),
       build_embedded: Mix.env == :prod,
@@ -30,33 +30,20 @@ defmodule Bouncer.Mixfile do
     ]
   end
 
-  # Specifies which paths to compile per environment.
   defp elixirc_paths(:test), do: ["lib", "test/mocks"]
   defp elixirc_paths(_),     do: ["lib"]
 
   defp applications(:test), do: [:phoenix, :logger]
   defp applications(_), do: [:logger]
 
-  # Configuration for the OTP application
-  #
-  # Type "mix help compile.app" for more information
   def application do
     [mod: {Bouncer, []}, applications: applications(Mix.env)]
   end
 
-  # Dependencies can be Hex packages:
-  #
-  #   {:mydep, "~> 0.3.0"}
-  #
-  # Or git/path repositories:
-  #
-  #   {:mydep, git: "https://github.com/elixir-lang/mydep.git", tag: "0.1.0"}
-  #
-  # Type "mix help deps" for more examples and options
   defp deps do
     [
       {:phoenix, ">= 1.0.0"},
-      {:httpoison, "~> 0.7.2"},
+      {:poison, "~> 1.5"},
       {:redix, ">= 0.0.0"},
       {:poolboy, "~> 1.4"},
       {:earmark, "~> 0.1", only: :dev},
