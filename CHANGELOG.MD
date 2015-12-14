@@ -1,5 +1,14 @@
 # Changes to bouncer
 
+##  v0.1.5
+
+* Adding Utility module and debug_piped function so that users can see result
+  of auth token verification when logger is set to debug.
+* Updating plug dependency so that (hopefully) generated tokens are URL-safe.
+* Changing adapter to be a function instead of module property so that it
+  can be changed after being compiled.
+* Reorganizing lib directory.
+
 ## v0.1.4
 
 * #13: Use Poison instead of HTTPoison.

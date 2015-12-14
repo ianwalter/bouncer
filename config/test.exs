@@ -1,5 +1,7 @@
 use Mix.Config
 
+config :logger, level: :info
+
 config :bouncer,
   adapter: Bouncer.Adapters.Redis,
   redis: "redis://localhost:6379/2",

@@ -19,7 +19,7 @@ defmodule Bouncer.Mixfile do
   def project do
     [
       app: :bouncer,
-      version: "0.1.4",
+      version: "0.1.5",
       elixir: ">= 1.0.0",
       elixirc_paths: elixirc_paths(Mix.env),
       build_embedded: Mix.env == :prod,
@@ -42,6 +42,7 @@ defmodule Bouncer.Mixfile do
 
   defp deps do
     [
+      {:plug, ">= 1.0.3"},
       {:phoenix, ">= 1.0.0"},
       {:poison, "~> 1.5"},
       {:redix, ">= 0.0.0"},

@@ -5,8 +5,9 @@ defmodule Bouncer.Session do
 
   alias Plug.Conn
   alias Bouncer.Token
+  alias Bouncer.Utility
 
-  @adapter Application.get_env(:bouncer, :adapter)
+  def adapter, do: Application.get_env(:bouncer, :adapter)
 
   @doc """
   Generates a session token. The ttl (time-to-live) defaults to 2 weeks.
@@ -26,7 +27,7 @@ defmodule Bouncer.Session do
   @doc """
   Saves session data given a key and optional ttl (time-to-live).
   """
-  def save(data, key, ttl), do: @adapter.save(data, key, ttl)
+  def save(data, key, ttl), do: adapter.save(data, key, ttl)
 
   @doc """
   Retrieves session data given an authorization token and puts it into the
@@ -34,7 +35,10 @@ defmodule Bouncer.Session do
   """
   def put_current_user(conn) do
     if Map.has_key? conn.private, :auth_token do
-      conn = conn |> verify(conn.private.auth_token) |> put_current_user(conn)
+      conn = conn
+      |> verify(conn.private.auth_token)
+      |> Utility.debug_piped("Auth token verification: ")
+      |> put_current_user(conn)
     end
     conn
   end
