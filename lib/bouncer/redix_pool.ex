@@ -1,4 +1,8 @@
 defmodule Bouncer.RedixPool do
+  @moduledoc """
+  A library of functions used to create and use a Redis pool through Redix.
+  """
+
   use Supervisor
 
   def start_link do

@@ -5,7 +5,7 @@ defmodule Bouncer.Token do
 
   alias Phoenix.Token
 
-  @adapter Application.get_env(:bouncer, :adapter)
+  def adapter, do: Application.get_env(:bouncer, :adapter)
 
   @doc """
   Generates a token, uses it as a key to save user data to the store, and
@@ -13,10 +13,10 @@ defmodule Bouncer.Token do
   """
   def generate(conn, namespace, user, ttl) do
     token = Token.sign(conn, namespace, user.id)
-    case @adapter.save(user, token, ttl) do
+    case adapter.save(user, token, ttl) do
 
       {:ok, ^token} ->
-        case @adapter.add(user.id, token) do
+        case adapter.add(user.id, token) do
           {:ok, _} -> {:ok, token}
           response -> response
         end
@@ -32,7 +32,7 @@ defmodule Bouncer.Token do
   """
   def verify(conn, namespace, token) do
     case validate([conn, namespace, token]) do
-      ^token -> @adapter.get(token)
+      ^token -> adapter.get(token)
       false -> {:error, "Invalid token"}
     end
   end
@@ -62,8 +62,9 @@ defmodule Bouncer.Token do
   user's ID.
   """
   def delete_all(conn, namespace, id) do
-    {_, tokens} = @adapter.all(id)
-    Enum.map(tokens, &([conn, namespace, &1]))
+    {_, tokens} = adapter.all(id)
+    tokens
+    |> Enum.map(&([conn, namespace, &1]))
     |> Enum.filter_map(&validate/1, fn ([_, _, token]) -> token end)
     |> delete(id)
   end
@@ -72,7 +73,7 @@ defmodule Bouncer.Token do
   Deletes token(s) and disassociates them with the given user's ID.
   """
   def delete(token, id) do
-    @adapter.delete(token)
-    @adapter.remove(id, token)
+    adapter.delete(token)
+    adapter.remove(id, token)
   end
 end

@@ -13,7 +13,7 @@ defmodule Bouncer.Session do
   Generates a session token. The ttl (time-to-live) defaults to 2 weeks.
   See Bouncer.Token.Generate/4.
   """
-  def generate(conn, user, ttl \\ 1210000) do
+  def generate(conn, user, ttl \\ 1_210_000) do
     Token.generate(conn, "user", user, ttl)
   end
 
@@ -35,12 +35,13 @@ defmodule Bouncer.Session do
   """
   def put_current_user(conn) do
     if Map.has_key? conn.private, :auth_token do
-      conn = conn
+      conn
       |> verify(conn.private.auth_token)
       |> Utility.debug_piped("Auth token verification: ")
       |> put_current_user(conn)
+    else
+      conn
     end
-    conn
   end
 
   @doc """
@@ -78,9 +79,13 @@ defmodule Bouncer.Session do
       false
   """
   def user_request?(conn, id) do
-    if is_bitstring(id), do: {id, _} = Integer.parse(id)
-    Map.has_key?(conn.private, :current_user) &&
-    Map.has_key?(conn.private.current_user, :id) &&
-    conn.private.current_user.id == id
+    has_current_user = Map.has_key?(conn.private, :current_user) &&
+                       Map.has_key?(conn.private.current_user, :id)
+    if is_bitstring(id) do
+      {id, _} = Integer.parse(id)
+      has_current_user && conn.private.current_user.id == id
+    else
+      has_current_user && conn.private.current_user.id == id
+    end
   end
 end

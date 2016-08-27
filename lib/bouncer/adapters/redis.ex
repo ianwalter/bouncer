@@ -5,6 +5,7 @@ defmodule Bouncer.Adapters.Redis do
   """
 
   alias Bouncer.RedixPool
+  alias Poison.Parser
 
   @doc """
   Saves data to Redis using a given key. If ttl is not nil, the value  will be
@@ -49,7 +50,7 @@ defmodule Bouncer.Adapters.Redis do
   def get(key) do
     case RedixPool.command(~w(GET) ++ [key]) do
       {_, nil}  -> {:error, nil}
-      {_, data} -> {:ok, Poison.Parser.parse!(data, keys: :atoms!)}
+      {_, data} -> {:ok, Parser.parse!(data, keys: :atoms!)}
     end
   end
 

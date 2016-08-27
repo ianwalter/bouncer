@@ -1,4 +1,8 @@
 defmodule Bouncer do
+  @moduledoc """
+  Token-based authorization and session management for Phoenix (Elixir).
+  """
+
   use Application
 
   # See http://elixir-lang.org/docs/stable/elixir/Application.html

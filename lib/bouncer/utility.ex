@@ -1,4 +1,7 @@
 defmodule Bouncer.Utility do
+  @moduledoc """
+  A library of functions used for debugging.
+  """
 
   require Logger
 

@@ -8,7 +8,7 @@ defmodule Bouncer.EmailVerification do
   @doc """
   Generates an email verification token. See Bouncer.Token.Generate/4.
   """
-  def generate(conn, user, ttl \\ 86400) do
+  def generate(conn, user, ttl \\ 86_400) do
     Token.generate(conn, "email", user, ttl)
   end
 
@@ -22,7 +22,7 @@ defmodule Bouncer.EmailVerification do
   Removes any previous email verification tokens and generates a new one. See
   Bouncer.Token.regenerate/4.
   """
-  def regenerate(conn, user, ttl \\ 86400) do
+  def regenerate(conn, user, ttl \\ 86_400) do
      Token.regenerate(conn, "email", user, ttl)
   end
 
