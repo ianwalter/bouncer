@@ -1,5 +1,10 @@
 # Changes to bouncer
 
+## v0.1.6
+
+* Updating poison dependency from "~> 1.5" to "~> 1.5 or ~> 2.0" and phoenix
+  dependency to >= 1.2.1
+
 ##  v0.1.5
 
 * Adding Utility module and debug_piped function so that users can see result
