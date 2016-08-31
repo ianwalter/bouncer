@@ -32,7 +32,7 @@ defmodule Plugs.AuthorizeTest do
   test "user data is added when correct auth header is specified",
     %{conn: conn} do
 
-    user = %{id: 1}
+    user = %{"id" => 1}
     {:ok, token} = Session.generate conn, user
 
     conn = conn

@@ -1,5 +1,10 @@
 # Changes to bouncer
 
+## v0.2.0
+
+* Move from atom-keyed to string-keyed maps [#17](https://github.com/ianwalter/bouncer/issues/17)
+* Ensure tokens are URL-safe [#15](https://github.com/ianwalter/bouncer/issues/15)
+
 ## v0.1.6
 
 * Updating poison dependency from "~> 1.5" to "~> 1.5 or ~> 2.0" and phoenix

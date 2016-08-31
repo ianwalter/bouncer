@@ -66,13 +66,13 @@ defmodule Bouncer.Session do
   request matches the given User ID.
 
   ## examples
-      iex> Bouncer.Session.user_request? %{private: %{current_user: %{id: 1}}},
+      iex> Bouncer.Session.user_request? %{private: %{current_user: %{"id" => 1}}},
       ...> 1
       true
-      iex> Bouncer.Session.user_request? %{private: %{current_user: %{id: 1}}},
+      iex> Bouncer.Session.user_request? %{private: %{current_user: %{"id" => 1}}},
       ...> "1"
       true
-      iex> Bouncer.Session.user_request? %{private: %{current_user: %{id: 1}}},
+      iex> Bouncer.Session.user_request? %{private: %{current_user: %{"id" => 1}}},
       ...> "2"
       false
       iex> Bouncer.Session.user_request? %{private: %{}}, 1
@@ -80,12 +80,12 @@ defmodule Bouncer.Session do
   """
   def user_request?(conn, id) do
     has_current_user = Map.has_key?(conn.private, :current_user) &&
-                       Map.has_key?(conn.private.current_user, :id)
+                       Map.has_key?(conn.private.current_user, "id")
     if is_bitstring(id) do
       {id, _} = Integer.parse(id)
-      has_current_user && conn.private.current_user.id == id
+      has_current_user && conn.private.current_user["id"] == id
     else
-      has_current_user && conn.private.current_user.id == id
+      has_current_user && conn.private.current_user["id"] == id
     end
   end
 end

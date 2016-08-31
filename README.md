@@ -40,7 +40,7 @@ be installed as:
 
     ```elixir
     def deps do
-      [{:bouncer, "~> 0.1.6"}]
+      [{:bouncer, "~> 0.2.0"}]
     end
     ```
 
@@ -57,7 +57,7 @@ be installed as:
 Bouncer requires the [Phoenix framework](http://www.phoenixframework.org/)
 because it uses it's Token module to generate tokens that are used both as an
 Authorization header and a session key. Despite this requirement, I imagine it
-could be used with an [Plug](https://github.com/elixir-lang/plug)-based
+could be used with any [Plug](https://github.com/elixir-lang/plug)-based
 framework. Bouncer provides a plug that can be used to authorize a request for
 certain controllers and/or controller actions:
 
@@ -129,7 +129,7 @@ defmodule MyApp.SessionController do
 
   def delete conn, _params do
     if user = conn.private.current_user do
-      case Session.destroy conn.private.auth_token, user.id do
+      case Session.destroy conn.private.auth_token, user["id"] do
         {:ok, _} -> send_resp conn, :no_content, ""
         _ -> send_resp conn, :bad_request, ""
       end

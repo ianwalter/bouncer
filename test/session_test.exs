@@ -16,7 +16,7 @@ defmodule SessionTest do
   end
 
   test "session is generated", %{conn: conn} do
-    user = %{id: 1}
+    user = %{"id" => 1}
     {:ok, token} = Session.generate conn, user
 
     assert {:ok, [token]} === Redis.all 1
@@ -24,7 +24,7 @@ defmodule SessionTest do
   end
 
   test "current_user can be put into the connection", %{conn: conn} do
-    user = %{id: 1}
+    user = %{"id" => 1}
     {:ok, token} = Session.generate conn, user
 
     conn = conn
@@ -36,20 +36,20 @@ defmodule SessionTest do
   end
 
   test "session is destroyed", %{conn: conn} do
-    user = %{id: 1}
+    user = %{"id" => 1}
     {:ok, token} = Session.generate conn, user
 
-    assert {:ok, 1} === Session.destroy token, user.id
-    assert {:ok, []} === Redis.all user.id
+    assert {:ok, 1} === Session.destroy token, user["id"]
+    assert {:ok, []} === Redis.all user["id"]
     assert {:error, nil} === Redis.get token
   end
 
   test "all user sessions are destroyed", %{conn: conn} do
-    user = %{id: 1}
+    user = %{"id" => 1}
     {:ok, tokenOne} = Session.generate conn, user
     {:ok, tokenTwo} = Session.generate conn, user
 
-    Session.destroy_all conn, user.id
+    Session.destroy_all conn, user["id"]
 
     assert {:ok, []} === Redis.all 1
     assert {:error, nil} === Redis.get tokenOne

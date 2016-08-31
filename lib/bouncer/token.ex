@@ -12,11 +12,11 @@ defmodule Bouncer.Token do
   associates it with the user's ID.
   """
   def generate(conn, namespace, user, ttl) do
-    token = Token.sign(conn, namespace, user.id)
+    token = Token.sign(conn, namespace, user["id"])
     case adapter.save(user, token, ttl) do
 
       {:ok, ^token} ->
-        case adapter.add(user.id, token) do
+        case adapter.add(user["id"], token) do
           {:ok, _} -> {:ok, token}
           response -> response
         end
@@ -53,7 +53,7 @@ defmodule Bouncer.Token do
   returns a new token.
   """
   def regenerate(conn, namespace, user, ttl) do
-    delete_all(conn, namespace, user.id)
+    delete_all(conn, namespace, user["id"])
     generate(conn, namespace, user, ttl)
   end
 

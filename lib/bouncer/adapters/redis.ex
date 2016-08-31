@@ -12,7 +12,7 @@ defmodule Bouncer.Adapters.Redis do
   converted from seconds to miliseconds and set as the key's time-to-live.
 
   ## Examples
-      iex> Bouncer.Adapters.Redis.save %{id: 1}, "UdOnTkNoW", nil
+      iex> Bouncer.Adapters.Redis.save %{"id" => 1}, "UdOnTkNoW", nil
       {:ok, "UdOnTkNoW"}
   """
   def save(data, key, ttl) do
@@ -24,7 +24,7 @@ defmodule Bouncer.Adapters.Redis do
   Sets the TTL (time-to-live in seconds) of the given key.
 
   ## Examples
-      iex> Bouncer.Adapters.Redis.save %{id: 1}, "UdOnTkNoW", nil
+      iex> Bouncer.Adapters.Redis.save %{"id" => 1}, "UdOnTkNoW", nil
       ...> Bouncer.Adapters.Redis.expire "UdOnTkNoW", 1
       {:ok, "UdOnTkNoW"}
       iex> Bouncer.Adapters.Redis.expire "Arcadia", 1
@@ -41,16 +41,16 @@ defmodule Bouncer.Adapters.Redis do
   Retrieves data from Redis using a given key.
 
   ## Examples
-      iex> Bouncer.Adapters.Redis.save %{id: 1},"UdOnTkNoW", nil
+      iex> Bouncer.Adapters.Redis.save %{"id" => 1},"UdOnTkNoW", nil
       ...> Bouncer.Adapters.Redis.get "UdOnTkNoW"
-      {:ok, %{id: 1}}
+      {:ok, %{"id" => 1}}
       iex> Bouncer.Adapters.Redis.get "Arcadia"
       {:error, nil}
   """
   def get(key) do
     case RedixPool.command(~w(GET) ++ [key]) do
       {_, nil}  -> {:error, nil}
-      {_, data} -> {:ok, Parser.parse!(data, keys: :atoms!)}
+      {_, data} -> {:ok, Parser.parse!(data)}
     end
   end
 
@@ -97,8 +97,8 @@ defmodule Bouncer.Adapters.Redis do
   Deletes given key(s) from Redis.
 
   ## Examples
-      iex> Bouncer.Adapters.Redis.save %{id: 1}, "UdOnTkNoW", nil
-      ...> Bouncer.Adapters.Redis.save %{id: 2}, "Arcadia", nil
+      iex> Bouncer.Adapters.Redis.save %{"id" => 1}, "UdOnTkNoW", nil
+      ...> Bouncer.Adapters.Redis.save %{"id" => 2}, "Arcadia", nil
       ...> Bouncer.Adapters.Redis.delete ["UdOnTkNoW", "Arcadia"]
       {:ok, ["UdOnTkNoW", "Arcadia"]}
       iex> Bouncer.Adapters.Redis.delete []
@@ -115,7 +115,7 @@ defmodule Bouncer.Adapters.Redis do
   Deletes a given key from Redis.
 
   ## Examples
-      iex> Bouncer.Adapters.Redis.save %{id: 1}, "UdOnTkNoW", nil
+      iex> Bouncer.Adapters.Redis.save %{"id" => 1}, "UdOnTkNoW", nil
       ...> Bouncer.Adapters.Redis.delete "UdOnTkNoW"
       {:ok, "UdOnTkNoW"}
       iex> Bouncer.Adapters.Redis.delete "Arcadia"
