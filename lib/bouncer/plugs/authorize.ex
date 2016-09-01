@@ -41,9 +41,9 @@ defmodule Bouncer.Plugs.Authorize do
 
   ## Examples
       iex> conn = %Plug.Conn{}
-      iex> conn = Plug.Conn.put_req_header(conn, "authorization", "Bearer: 1")
+      iex> conn = Plug.Conn.put_req_header(conn, "authorization", "Bearer 1")
       iex> Bouncer.Plugs.Authorize.get_auth_header conn
-      "Bearer: 1"
+      "Bearer 1"
       iex> Bouncer.Plugs.Authorize.get_auth_header %Plug.Conn{}
       nil
   """
@@ -55,12 +55,12 @@ defmodule Bouncer.Plugs.Authorize do
   Extracts the authorization token out of the request header value.
 
   ## Examples
-      iex> Bouncer.Plugs.Authorize.get_auth_token "Bearer: test"
+      iex> Bouncer.Plugs.Authorize.get_auth_token "Bearer test"
       "test"
       iex> Bouncer.Plugs.Authorize.get_auth_token nil
       nil
   """
   def get_auth_token(header_value) do
-    if header_value, do: List.last(String.split(header_value, "Bearer: "))
+    if header_value, do: List.last(String.split(header_value, "Bearer "))
   end
 end

@@ -1,5 +1,10 @@
 # Changes to bouncer
 
+## v0.3.0
+
+* Change Authorization header to accept "Bearer $token" instead of
+  "Bearer: $token" since the former is the actual standard pattern.
+
 ## v0.2.0
 
 * Move from atom-keyed to string-keyed maps [#17](https://github.com/ianwalter/bouncer/issues/17)

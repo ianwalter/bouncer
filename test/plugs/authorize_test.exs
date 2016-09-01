@@ -23,7 +23,7 @@ defmodule Plugs.AuthorizeTest do
 
   test "no user data is added when bogus auth token received", %{conn: conn} do
     conn = conn
-    |> Conn.put_req_header("authorization", "Bearer: test")
+    |> Conn.put_req_header("authorization", "Bearer test")
     |> Authorize.call(nil)
 
     refute Map.has_key?(conn.private, :current_user)
@@ -36,7 +36,7 @@ defmodule Plugs.AuthorizeTest do
     {:ok, token} = Session.generate conn, user
 
     conn = conn
-    |> Conn.put_req_header("authorization", "Bearer: #{token}")
+    |> Conn.put_req_header("authorization", "Bearer #{token}")
     |> Bouncer.Plugs.Authorize.call(nil)
 
     assert conn.private.auth_token == token

@@ -28,7 +28,7 @@ defmodule SessionTest do
     {:ok, token} = Session.generate conn, user
 
     conn = conn
-    |> Conn.put_req_header("authorization", "Bearer: #{token}")
+    |> Conn.put_req_header("authorization", "Bearer #{token}")
     |> Authorize.put_auth_token
     |> Session.put_current_user
 
