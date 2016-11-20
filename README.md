@@ -16,10 +16,10 @@ around Redis is strong so working with the session data is pretty easy.
 
 [Guardian](https://github.com/hassox/guardian) also wouldn’t work because it
 uses JSON Web Tokens (JWT) as the basis for it’s authorization scheme. JWTs can
-work but [I don’t believe it’s a better system than the traditional session-based system](https://medium.com/@IanWalter/ole-thank-you-for-your-response-it-s-exactly-the-kind-of-feedback-i-was-looking-for-117df9438ccc#.icimd0nwv). JWTs don't provide a way of immediately invalidating
+work but [I don’t believe it’s a better system than the traditional session-based system](https://medium.com/@IanWalter/ole-thank-you-for-your-response-it-s-exactly-the-kind-of-feedback-i-was-looking-for-117df9438ccc#.icimd0nwv). 
+JWTs don't provide a way of immediately invalidating
 user sessions instead relying on short token lifetimes. The ability to
-immediately invalidate a session is a feature that I want to provide to users
-as well as be able to do on occasion (i.e. when a user resets their password).
+immediately invalidate a session is a feature that I find useful in certain situations (i.e. when a user resets their password).
 
 ## Features
 
