@@ -5,6 +5,12 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: elixir
+    services:
+      redis:
+        image: redis
+        ports:
+          - "6379:6379"
+        options: --entrypoint redis-server
     steps:
       - name: Checkout
         uses: actions/checkout@master
