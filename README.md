@@ -1,4 +1,5 @@
-# Bouncer (beta) [![Hex Version](https://img.shields.io/hexpm/v/bouncer.svg)](https://hex.pm/packages/bouncer) [![Build Status](https://semaphoreci.com/api/v1/projects/f9fd62d2-a799-4b66-8d72-06bbc290d32b/570486/shields_badge.svg)](https://semaphoreci.com/ianwalter/bouncer)
+# Bouncer (beta) 
+[![Hex Version](https://img.shields.io/hexpm/v/bouncer.svg)](https://hex.pm/packages/bouncer) 
 
 **Token-based authorization and session management for Phoenix (Elixir)**
 
