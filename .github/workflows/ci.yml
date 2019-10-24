@@ -10,6 +10,8 @@ jobs:
         uses: actions/checkout@master
       - name: Install Hex
         run: mix local.hex --force
+      - name: Rebar
+        run: mix local.rebar
       - name: Install Dependencies
         run: mix deps.get --only test
       - name: Test

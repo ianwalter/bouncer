@@ -5,7 +5,7 @@ defmodule Bouncer.Mixfile do
     [
       files: ["lib", "mix.exs", "README.md", "LICENSE"],
       maintainers: ["Ian Walter"],
-      licenses: ["MIT"],
+      licenses: ["SEE LICENSE IN LICENSE"],
       links: %{"GitHub" => "https://github.com/ianwalter/bouncer"}
     ]
   end
