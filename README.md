@@ -1,7 +1,7 @@
-# Bouncer (beta) 
-[![Hex Version](https://img.shields.io/hexpm/v/bouncer.svg)](https://hex.pm/packages/bouncer) 
+# Bouncer (beta)
+> Token-based authorization and session management for Phoenix (Elixir)
 
-**Token-based authorization and session management for Phoenix (Elixir)**
+[![Hex Version](https://img.shields.io/hexpm/v/bouncer.svg)](https://hex.pm/packages/bouncer)
 
 ## Why
 
